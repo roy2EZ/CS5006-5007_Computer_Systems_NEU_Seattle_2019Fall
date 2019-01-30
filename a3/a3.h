@@ -1,7 +1,6 @@
 #ifndef A3_H
 #define A3_H
 
-
 /* 
  * Ask on Piazza with any other questions! 
  */
