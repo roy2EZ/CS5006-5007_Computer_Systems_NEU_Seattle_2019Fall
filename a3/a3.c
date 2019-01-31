@@ -5,8 +5,9 @@
 #include <ctype.h>
 #include "a3.h"
 
+// Name:Rongyi CHEN
+// Date: 1/31/2019
 
-// MY CODE GOES HERE
 void big(Name *name) {
   char strBig[100];
   strcpy(strBig, ("%s", name->first));
