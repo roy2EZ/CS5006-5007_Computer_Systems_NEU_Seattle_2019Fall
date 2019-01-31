@@ -131,7 +131,6 @@ void test_fillName() {
   char dest5[100] = {0};
   fillName(&name1, 's', dest5);
   printf("fillName result for format Small : %s\n", dest5);
-	
   end_test();
 }
 
