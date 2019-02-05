@@ -8,7 +8,7 @@ enum suit {HEARTS, CLUBS, SPADES, DIAMONDS};
 
 typedef enum suit Suit;
 
-enum name {NINE = 9, TEN, JACK, QUEEN, KING, ACE};
+enum name {NINE = 9, TEN = 10, JACK = 11, QUEEN = 12, KING = 13, ACE = 14};
 
 typedef enum name Name;
 
