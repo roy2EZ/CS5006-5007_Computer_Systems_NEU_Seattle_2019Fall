@@ -26,7 +26,7 @@ void end_test() {
 void test_create_deck() {
   start_test("create_deck");
 
-  Deck *deck = createDeck();
+  Deck* deck = createDeck();
 
   // deck should be empty at this stage
   assert(deck->topCard < 1);
@@ -42,7 +42,7 @@ void test_create_deck() {
 
   end_test();
 }
-
+/*
 void test_push_card_to_deck() {
   start_test("push_card_to_deck");
 
@@ -453,13 +453,14 @@ void test_sort_hand() {
 void test_shuffle_hand() {
   start_test("shuffle_hand");
   end_test();
-}
+} */
 
 int main(void) {
   srand(21774);
 
+  printf("start");
   test_create_deck();
-  test_push_card_to_deck();
+  /*test_push_card_to_deck();
   test_populate_deck();
   test_peek_at_top_card();
   test_pop_card_from_deck();
@@ -472,8 +473,9 @@ int main(void) {
   test_who_won();
   test_get_best_move();
   test_sort_hand();
-  test_shuffle_hand();
+  test_shuffle_hand();*/
 
+  printf("end");
   return EXIT_SUCCESS;
 }
 

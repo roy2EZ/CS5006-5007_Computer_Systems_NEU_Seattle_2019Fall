@@ -13,7 +13,10 @@ Deck* createDeck() {
   //Initialize
   newDeck->topCard = -1;
   //Return pointer to new deck
-  return newDeck
+  return newDeck;
 }
 
+void destroyDeck(Deck* Deck) {
+  free(Deck);
+}
 
