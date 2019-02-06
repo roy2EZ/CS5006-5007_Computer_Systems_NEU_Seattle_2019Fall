@@ -8,11 +8,11 @@
 // Put your deck functions in here
 
 Deck* createDeck() {
-  //Allocate space on the heap
+  // Allocate space on the heap
   Deck* newDeck = (Deck*)malloc(sizeof(Deck));
-  //Initialize
+  // Initialize
   newDeck->topCard = -1;
-  //Return pointer to new deck
+  // Return pointer to new deck
   return newDeck;
 }
 
@@ -21,17 +21,17 @@ void destroyDeck(Deck* deck) {
 }
 
 Deck* pushCardToDeck(Card* newCard, Deck* cardDeck) {
-  //Update the head index
+  // Update the head index
   cardDeck->topCard++;
 
-  //Put the newCard into the cardDeck
+  // Put the newCard into the cardDeck
   cardDeck->cards[cardDeck->topCard] = newCard;
 
   return cardDeck;
 }
 
 Card* peekAtTopCard(Deck* cardDeck) {
-  //Get the top card from the cardDeck
+  // Get the top card from the cardDeck
   return cardDeck->cards[NUM_CARDS_IN_DECK];
 }
 
