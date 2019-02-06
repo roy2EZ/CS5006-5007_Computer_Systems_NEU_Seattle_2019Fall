@@ -35,5 +35,20 @@ Card* peekAtTopCard(Deck* cardDeck) {
   return cardDeck->cards[NUM_CARDS_IN_DECK];
 }
 
+Card* popCardFromDeck(Deck* cardDeck) {
+  if (cardDeck->topCard == -1) {
+  return NULL;
+  } else {
+  return cardDeck->cards[cardDeck->topCard--];
+  }
+}
+
+int isDeckEmpty(Deck* cardDeck) {
+  if (cardDeck->topCard == -1) {
+  return 1;
+  } else {
+  return 0;
+  }
+}
 
 

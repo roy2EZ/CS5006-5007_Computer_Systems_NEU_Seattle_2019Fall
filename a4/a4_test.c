@@ -88,6 +88,7 @@ void test_push_card_to_deck() {
 
   assert(peekAtTopCard(deck)->name == card4.name);
   assert(peekAtTopCard(deck)->suit == card4.suit);
+  
 
   // not calling destroyDeck here because cards are on stack.
   // I'm just calling free instead.
@@ -179,8 +180,8 @@ void test_peek_at_top_card() {
   free(deck);
 
   end_test();
-}
-/*
+}*/
+
 void test_pop_card_from_deck() {
   start_test("pop_card_from_deck");
 
@@ -201,6 +202,8 @@ void test_pop_card_from_deck() {
   assert(popCardFromDeck(deck) == &card2);
 
   assert(popCardFromDeck(deck) == &card1);
+
+  assert(popCardFromDeck(deck) == NULL);
 
   free(deck);
 
@@ -230,7 +233,7 @@ void test_is_deck_empty() {
   destroyDeck(deck);
 
   end_test();
-}
+}/*
 
 void test_shuffle() {
   start_test("test_shuffle");
@@ -467,8 +470,9 @@ int main(void) {
   test_push_card_to_deck();/*
   test_populate_deck();
   test_peek_at_top_card();
+  */
   test_pop_card_from_deck();
-  test_is_deck_empty();
+  test_is_deck_empty();/*
   test_shuffle();
   test_add_card_to_hand();
   test_remove_card_from_hand();
