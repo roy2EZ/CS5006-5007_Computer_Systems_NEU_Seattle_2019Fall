@@ -84,6 +84,10 @@ void test_push_card_to_deck() {
   assert(deck->cards[0] == &card1);
   assert(deck->cards[1] == &card2);
   assert(deck->cards[NUM_CARDS_IN_DECK - 1] == &card3);
+  assert(deck->cards[NUM_CARDS_IN_DECK] == &card4);
+
+  assert(peekAtTopCard(deck)->name == card4.name);
+  assert(peekAtTopCard(deck)->suit == card4.suit);
 
   // not calling destroyDeck here because cards are on stack.
   // I'm just calling free instead.
@@ -176,7 +180,7 @@ void test_peek_at_top_card() {
 
   end_test();
 }
-
+/*
 void test_pop_card_from_deck() {
   start_test("pop_card_from_deck");
 

@@ -30,6 +30,10 @@ Deck* pushCardToDeck(Card* newCard, Deck* cardDeck) {
   return cardDeck;
 }
 
+Card* peekAtTopCard(Deck* cardDeck) {
+  //Get the top card from the cardDeck
+  return cardDeck->cards[NUM_CARDS_IN_DECK];
+}
 
 
 
