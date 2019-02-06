@@ -16,7 +16,18 @@ Deck* createDeck() {
   return newDeck;
 }
 
-void destroyDeck(Deck* Deck) {
-  free(Deck);
+void destroyDeck(Deck* deck) {
+  free(deck);
 }
+
+Deck* pushCardToDeck(Card* newCard, Deck* cardDeck) {
+  //Update the head index
+  cardDeck->topCard++;
+
+  //Put the newCard into the cardDeck
+  cardDeck->cards[cardDeck->topCard] = newCard;
+
+  return cardDeck;
+}
+
 

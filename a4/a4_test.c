@@ -42,11 +42,11 @@ void test_create_deck() {
 
   end_test();
 }
-/*
+
 void test_push_card_to_deck() {
   start_test("push_card_to_deck");
 
-  Deck *deck = createDeck();
+  Deck* deck = createDeck();
 
   Card card1 = {NINE, HEARTS, -1};
   int top = deck->topCard;
@@ -91,7 +91,7 @@ void test_push_card_to_deck() {
 
   end_test();
 }
-
+/*
 void test_populate_deck() {
   start_test("populate_deck");
 
@@ -460,7 +460,7 @@ int main(void) {
 
   printf("start");
   test_create_deck();
-  /*test_push_card_to_deck();
+  test_push_card_to_deck();/*
   test_populate_deck();
   test_peek_at_top_card();
   test_pop_card_from_deck();
