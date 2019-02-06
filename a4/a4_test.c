@@ -84,12 +84,7 @@ void test_push_card_to_deck() {
   assert(deck->cards[0] == &card1);
   assert(deck->cards[1] == &card2);
   assert(deck->cards[NUM_CARDS_IN_DECK - 1] == &card3);
-  assert(deck->cards[NUM_CARDS_IN_DECK] == &card4);
-
-  assert(peekAtTopCard(deck)->name == card4.name);
-  assert(peekAtTopCard(deck)->suit == card4.suit);
-  
-
+  assert(deck->cards[NUM_CARDS_IN_DECK] == &card4); 
   // not calling destroyDeck here because cards are on stack.
   // I'm just calling free instead.
   free(deck);
@@ -240,6 +235,7 @@ void test_shuffle() {
 
   end_test();
 }
+*/
 
 void test_add_card_to_hand() {
   start_test("add_card_to_hand");
@@ -270,7 +266,7 @@ void test_add_card_to_hand() {
 
   end_test();
 }
-
+/*
 void test_remove_card_from_hand() {
   start_test("remove_card_from_hand");
 
@@ -473,8 +469,8 @@ int main(void) {
   */
   test_pop_card_from_deck();
   test_is_deck_empty();/*
-  test_shuffle();
-  test_add_card_to_hand();
+  test_shuffle();*/
+  test_add_card_to_hand();/*
   test_remove_card_from_hand();
   test_deal();
   test_is_legal_move();

@@ -8,7 +8,7 @@ enum suit {HEARTS, CLUBS, SPADES, DIAMONDS};
 
 typedef enum suit Suit;
 
-enum name {NINE = 9, TEN = 10, JACK = 11, QUEEN = 12, KING = 13, ACE = 14};
+enum name {NINE = 9, TEN, JACK, QUEEN, KING, ACE};
 
 typedef enum name Name;
 
@@ -36,16 +36,15 @@ struct game_score {
 typedef struct game_score GameScore;
 
 typedef struct card_node CardNode;
-
 struct card_node {
-  CardNode *nextCard;
-  CardNode *prevCard;
-  Card *thisCard;
+  CardNode* nextCard;
+  CardNode* prevCard;
+  Card* thisCard;
 };
 
 struct hand {
   int num_cards_in_hand;
-  CardNode *firstCard;
+  CardNode* firstCard;
 };
 
 typedef struct hand Hand;
