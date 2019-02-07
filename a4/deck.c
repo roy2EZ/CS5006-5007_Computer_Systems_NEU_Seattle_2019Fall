@@ -17,6 +17,11 @@ Deck* createDeck() {
 }
 
 void destroyDeck(Deck* deck) {
+  if (!isDeckEmpty(deck)) {
+    for (int i = 0; i < NUM_CARDS_IN_DECK; i++) {
+      free(deck->cards[i]);
+    }
+  }
   free(deck);
 }
 

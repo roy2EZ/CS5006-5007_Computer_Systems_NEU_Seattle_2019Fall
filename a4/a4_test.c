@@ -175,7 +175,8 @@ void test_peek_at_top_card() {
   free(deck);
 
   end_test();
-}*/
+}
+*/
 
 void test_pop_card_from_deck() {
   start_test("pop_card_from_deck");
@@ -278,11 +279,11 @@ void test_remove_card_from_hand() {
   Card card3 = {JACK, SPADES, -1};
 
   addCardToHand(&card1, &hand);
-  assert(isHandEmpty(&hand) == 0);
+  assert(!isHandEmpty(&hand));
   // remove only card
   removeCardFromHand(&card1, &hand);
   assert(hand.num_cards_in_hand == 0);
-  assert(isHandEmpty(&hand) == 1);
+  assert(isHandEmpty(&hand));
   assert(hand.firstCard == NULL);
 
   addCardToHand(&card1, &hand);
@@ -291,7 +292,7 @@ void test_remove_card_from_hand() {
   removeCardFromHand(&card1, &hand);
 
   assert(hand.num_cards_in_hand == 1);
-  assert(isHandEmpty(&hand) == 0);
+  assert(!isHandEmpty(&hand));
   assert(hand.firstCard->thisCard == &card2);
   assert(hand.firstCard->nextCard == NULL);
   assert(hand.firstCard->prevCard == NULL);
@@ -301,14 +302,14 @@ void test_remove_card_from_hand() {
   removeCardFromHand(&card1, &hand);
 
   assert(hand.num_cards_in_hand == 1);
-  assert(isHandEmpty(&hand) == 0);
+  assert(!isHandEmpty(&hand));
   assert(hand.firstCard->thisCard == &card2);
   assert(hand.firstCard->nextCard == NULL);
   assert(hand.firstCard->prevCard == NULL);
 
   removeCardFromHand(&card2, &hand);
   assert(hand.num_cards_in_hand == 0);
-  assert(isHandEmpty(&hand) == 1);
+  assert(isHandEmpty(&hand));
   assert(hand.firstCard == NULL);
 
   addCardToHand(&card1, &hand);
@@ -322,10 +323,10 @@ void test_remove_card_from_hand() {
   assert(hand.firstCard->nextCard->nextCard == NULL);
   assert(hand.firstCard->thisCard == &card3);
   assert(hand.firstCard->prevCard == NULL);
-
   removeCardFromHand(&card3, &hand);
   removeCardFromHand(&card1, &hand);
-  assert(isHandEmpty(&hand) == 1);
+  assert(isHandEmpty(&hand));
+  destroyHand(&hand);
 
   end_test();
 }
@@ -461,28 +462,33 @@ void test_sort_hand() {
 void test_shuffle_hand() {
   start_test("shuffle_hand");
   end_test();
-} */
+}
+*/
 
 int main(void) {
   srand(21774);
 
   printf("start");
   test_create_deck();
-  test_push_card_to_deck();/*
+  test_push_card_to_deck();
+  /*
   test_populate_deck();
   test_peek_at_top_card();
   */
   test_pop_card_from_deck();
-  test_is_deck_empty();/*
+  test_is_deck_empty();
+  /*
   test_shuffle();*/
   test_add_card_to_hand();
-  test_remove_card_from_hand();/*
+  test_remove_card_from_hand();
+  /*
   test_deal();
   test_is_legal_move();
   test_who_won();
   test_get_best_move();
   test_sort_hand();
-  test_shuffle_hand();*/
+  test_shuffle_hand();
+  */
 
   printf("end");
   return EXIT_SUCCESS;

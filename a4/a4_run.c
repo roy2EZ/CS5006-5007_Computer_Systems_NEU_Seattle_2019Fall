@@ -25,8 +25,7 @@ Card* take_player1_turn(Hand *p1hand) {
 
 void flush_in() {
   char c;
-  while((c = getchar()) != '\n' && c != EOF) {
-
+  while ((c = getchar()) != '\n' && c != EOF) {
   }
 }
 
@@ -263,5 +262,4 @@ int main() {
   // I created it in this function, going to free it in this function.
 
   destroyDeck(gameDeck);
-
 }

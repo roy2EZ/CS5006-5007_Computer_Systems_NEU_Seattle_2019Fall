@@ -11,7 +11,7 @@ void printHand(Hand *aHand) {
 
   CardNode *cih = aHand->firstCard;
 
-  while(cih != NULL) {
+  while (cih != NULL) {
     printf("%d: ", i++);
     printCard(cih->thisCard);
     printf("\n");
@@ -27,7 +27,7 @@ void printHand(Hand *aHand) {
 void printDeck(Deck *aDeck) {
   int i;
 
-  for (i=0; i<NUM_CARDS_IN_DECK; i++) {
+  for (i = 0; i < NUM_CARDS_IN_DECK; i++) {
     printf("%d: ", i);
     printCard(aDeck->cards[i]);
     printf("\n");
@@ -35,7 +35,7 @@ void printDeck(Deck *aDeck) {
 }
 
 char *getSuit(Suit suit) {
-  switch(suit) {
+  switch (suit) {
     case HEARTS:
       return "Hearts";
     case SPADES:
@@ -51,8 +51,7 @@ char *getSuit(Suit suit) {
 }
 
 char * getName(Name name) {
-
-  switch(name) {
+  switch (name) {
     case NINE:
       return "Nine";
     break;

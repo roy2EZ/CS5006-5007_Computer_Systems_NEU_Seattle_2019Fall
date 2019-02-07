@@ -10,54 +10,41 @@
 // Implement the Hand and other functions in here
 
 Hand* createHand() {
-  Hand* newHand = (Hand*)malloc(sizeof(newHand));
+  Hand* newHand = (Hand*)malloc(sizeof(Hand));
   newHand->num_cards_in_hand = 0;
   newHand->firstCard = NULL;
   return newHand;
 }
 
+// Destroys the hand, freeing any memory allocated for it.
 void destroyHand(Hand* thisHand) {
-  free(thisHand->firstCard->nextCard);
+  if (!isHandEmpty(thisHand)) {
+    free(thisHand->firstCard->nextCard);
+  }
   free(thisHand->firstCard);
-  free(thisHand);
 }
 
 void addCardToHand(Card* card, Hand* thisHand) {
-  CardNode* thisCardNode = (CardNode*)malloc(sizeof(thisCardNode));
+  CardNode* thisCardNode = (CardNode*)malloc(sizeof(CardNode));
   thisCardNode->thisCard = card;
   thisCardNode->prevCard = NULL;
   thisCardNode->nextCard = thisHand->firstCard;
-  if(thisHand->firstCard != NULL) {
+  if (thisHand->firstCard != NULL) {
     thisHand->firstCard->prevCard = thisCardNode;
   }
   thisHand->firstCard = thisCardNode;
   thisHand->num_cards_in_hand++;
 }
-// Removes a card from the hand. Return a pointer to the card that's been removed from the hand. Consider if need to remove the CardNode from the heap.
-/*
-struct card {
-  Name name;
-  Suit suit;
-  int value;
-};
-struct card_node {
-  CardNode* nextCard;
-  CardNode* prevCard;
-  Card* thisCard;
-};
-typedef struct card_node CardNode;
-
-struct hand {
-  int num_cards_in_hand;
-  CardNode* firstCard;
-};*/
-
+// Removes a card from the hand. Return a pointer to the card
+// that's been removed from the hand.
+// Consider if need to remove the CardNode from the heap.
 Card* removeCardFromHand(Card *aCard, Hand *aHand) {
   CardNode* tempNode = aHand->firstCard;
   Card* topCard = aHand->firstCard->thisCard;
   // to search the nodes in hand using while loop
-  // while the firstCard in the hand is not NULL, which means there are cards in hand
-  while(tempNode != NULL) {
+  // while the firstCard in the hand is not NULL,
+  // which means there are cards in hand
+  while (tempNode != NULL) {
     Card* tempCard = tempNode->thisCard;
     // if tempCard is as same as the to-remove card aCard
     if (tempCard->name == aCard->name && tempCard->suit == aCard->suit) {
@@ -73,6 +60,7 @@ Card* removeCardFromHand(Card *aCard, Hand *aHand) {
       }
       tempNode->nextCard = NULL;
       tempNode->prevCard = NULL;
+      free(tempNode);
       return tempCard;
     }
     tempNode = tempNode->nextCard;
