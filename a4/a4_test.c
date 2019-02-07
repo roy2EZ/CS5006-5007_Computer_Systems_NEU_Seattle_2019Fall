@@ -266,7 +266,7 @@ void test_add_card_to_hand() {
 
   end_test();
 }
-/*
+
 void test_remove_card_from_hand() {
   start_test("remove_card_from_hand");
 
@@ -324,7 +324,7 @@ void test_remove_card_from_hand() {
 
   end_test();
 }
-
+/*
 void test_deal() {
   start_test("deal");
 
@@ -470,8 +470,8 @@ int main(void) {
   test_pop_card_from_deck();
   test_is_deck_empty();/*
   test_shuffle();*/
-  test_add_card_to_hand();/*
-  test_remove_card_from_hand();
+  test_add_card_to_hand();
+  test_remove_card_from_hand();/*
   test_deal();
   test_is_legal_move();
   test_who_won();
