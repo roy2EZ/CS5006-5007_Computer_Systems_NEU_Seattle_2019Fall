@@ -29,11 +29,9 @@ void addCardToHand(Card* card, Hand* thisHand) {
   thisCardNode->nextCard = thisHand->firstCard;
   if(thisHand->firstCard != NULL) {
     thisHand->firstCard->prevCard = thisCardNode;
-    printHand(thisHand);
   }
   thisHand->firstCard = thisCardNode;
   (thisHand->num_cards_in_hand)++;
-  printHand(thisHand);
 }
 // Removes a card from the hand. Return a pointer to the card that's been removed from the hand. Consider if need to remove the CardNode from the heap.
 /*
