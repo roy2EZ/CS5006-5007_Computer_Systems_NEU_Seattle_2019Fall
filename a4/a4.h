@@ -126,7 +126,7 @@ void addCardToHand(Card *card, Hand *hand);
 Card* removeCardFromHand(Card *card, Hand *hand);
 
 // Determines if there are any cards in the hand.
-// Return 0 if the hand is empty; 1 otherwise.
+// Return 1 if the hand is empty; 0 otherwise.
 int isHandEmpty(Hand*);
 
 // Destroys the hand, freeing any memory allocated for it.

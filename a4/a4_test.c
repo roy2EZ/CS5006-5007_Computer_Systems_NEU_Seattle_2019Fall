@@ -278,10 +278,11 @@ void test_remove_card_from_hand() {
   Card card3 = {JACK, SPADES, -1};
 
   addCardToHand(&card1, &hand);
+  assert(isHandEmpty(&hand) == 0);
   // remove only card
   removeCardFromHand(&card1, &hand);
-
   assert(hand.num_cards_in_hand == 0);
+  assert(isHandEmpty(&hand) == 1);
   assert(hand.firstCard == NULL);
 
   addCardToHand(&card1, &hand);
@@ -290,6 +291,7 @@ void test_remove_card_from_hand() {
   removeCardFromHand(&card1, &hand);
 
   assert(hand.num_cards_in_hand == 1);
+  assert(isHandEmpty(&hand) == 0);
   assert(hand.firstCard->thisCard == &card2);
   assert(hand.firstCard->nextCard == NULL);
   assert(hand.firstCard->prevCard == NULL);
@@ -299,12 +301,14 @@ void test_remove_card_from_hand() {
   removeCardFromHand(&card1, &hand);
 
   assert(hand.num_cards_in_hand == 1);
+  assert(isHandEmpty(&hand) == 0);
   assert(hand.firstCard->thisCard == &card2);
   assert(hand.firstCard->nextCard == NULL);
   assert(hand.firstCard->prevCard == NULL);
 
   removeCardFromHand(&card2, &hand);
   assert(hand.num_cards_in_hand == 0);
+  assert(isHandEmpty(&hand) == 1);
   assert(hand.firstCard == NULL);
 
   addCardToHand(&card1, &hand);
@@ -321,6 +325,7 @@ void test_remove_card_from_hand() {
 
   removeCardFromHand(&card3, &hand);
   removeCardFromHand(&card1, &hand);
+  assert(isHandEmpty(&hand) == 1);
 
   end_test();
 }

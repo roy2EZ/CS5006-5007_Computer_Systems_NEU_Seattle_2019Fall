@@ -81,3 +81,14 @@ Card* removeCardFromHand(Card *aCard, Hand *aHand) {
   }
   return NULL;
 }
+
+// Determines if there are any cards in the hand.
+// Return 1 if the hand is empty; 0 otherwise.
+int isHandEmpty(Hand* thisHand) {
+  if (thisHand->num_cards_in_hand == 0) {
+    return 1;
+  }
+  return 0;
+}
+
+
