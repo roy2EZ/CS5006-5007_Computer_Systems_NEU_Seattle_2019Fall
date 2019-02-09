@@ -78,5 +78,3 @@ int isHandEmpty(Hand* thisHand) {
   }
   return 0;
 }
-
-
