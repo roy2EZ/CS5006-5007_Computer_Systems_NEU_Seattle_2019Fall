@@ -235,11 +235,12 @@ void test_shuffle() {
 
   Deck *deck = populateDeck();
   printf("Deck before shuffle: \n");
-  printDeck(deck); 
-  shuffle(deck);
-  printf("Deck after shuffle: \n");
   printDeck(deck);
-  
+  shuffle(deck);
+  printf("\nDeck after shuffle: \n");
+  printDeck(deck);
+  destroyDeck(deck);
+
   end_test();
 }
 
@@ -330,24 +331,28 @@ void test_remove_card_from_hand() {
 
   end_test();
 }
-/*
+
 void test_deal() {
   start_test("deal");
 
   Deck *deck = populateDeck();
   shuffle(deck);
 
-  Card *expected_hand1[NUM_CARDS_IN_HAND] = {deck->cards[NUM_CARDS_IN_DECK - 1],
-                                             deck->cards[NUM_CARDS_IN_DECK - 3],
-                                             deck->cards[NUM_CARDS_IN_DECK - 5],
-                                             deck->cards[NUM_CARDS_IN_DECK - 7],
-                                             deck->cards[NUM_CARDS_IN_DECK - 9]};
+  Card *expected_hand1[NUM_CARDS_IN_HAND] = {
+    deck->cards[NUM_CARDS_IN_DECK - 1],
+    deck->cards[NUM_CARDS_IN_DECK - 3],
+    deck->cards[NUM_CARDS_IN_DECK - 5],
+    deck->cards[NUM_CARDS_IN_DECK - 7],
+    deck->cards[NUM_CARDS_IN_DECK - 9]
+  };
 
-  Card *expected_hand2[NUM_CARDS_IN_HAND] = {deck->cards[NUM_CARDS_IN_DECK - 2],
-                                             deck->cards[NUM_CARDS_IN_DECK - 4],
-                                             deck->cards[NUM_CARDS_IN_DECK - 6],
-                                             deck->cards[NUM_CARDS_IN_DECK - 8],
-                                             deck->cards[NUM_CARDS_IN_DECK - 10]};
+  Card *expected_hand2[NUM_CARDS_IN_HAND] = {
+    deck->cards[NUM_CARDS_IN_DECK - 2],
+    deck->cards[NUM_CARDS_IN_DECK - 4],
+    deck->cards[NUM_CARDS_IN_DECK - 6],
+    deck->cards[NUM_CARDS_IN_DECK - 8],
+    deck->cards[NUM_CARDS_IN_DECK - 10]
+  };
 
   Hand hand1;
   memset(&hand1, 0, sizeof(Hand));
@@ -359,8 +364,7 @@ void test_deal() {
 
   CardNode *ptr = hand1.firstCard;
   int i = 4;
-
-  while(ptr != NULL) {
+  while (ptr != NULL) {
     assert(ptr->thisCard == expected_hand1[i]);
     ptr = ptr->nextCard;
     i--;
@@ -369,7 +373,7 @@ void test_deal() {
   ptr = hand2.firstCard;
   i = 4;
 
-  while(ptr != NULL) {
+  while (ptr != NULL) {
     assert(ptr->thisCard == expected_hand2[i]);
     ptr = ptr->nextCard;
     i--;
@@ -377,7 +381,7 @@ void test_deal() {
 
   ptr = hand1.firstCard;
 
-  while(ptr != NULL) {
+  while (ptr != NULL) {
     CardNode *next = ptr->nextCard;
     free(ptr);
     ptr = next;
@@ -385,7 +389,7 @@ void test_deal() {
 
   ptr = hand2.firstCard;
 
-  while(ptr != NULL) {
+  while (ptr != NULL) {
     CardNode *next = ptr->nextCard;
     free(ptr);
     ptr = next;
@@ -393,10 +397,8 @@ void test_deal() {
 
   end_test();
   destroyDeck(deck);
-  destroyHand(hand1);
-  destoryHand(hand2); 
 }
-*/
+
 void test_is_legal_move() {
   start_test("is_legal_move");
 
@@ -479,9 +481,7 @@ int main(void) {
   test_shuffle();
   test_add_card_to_hand();
   test_remove_card_from_hand();
-  /*
   test_deal();
-  */
   test_is_legal_move();
   test_who_won();
   /*

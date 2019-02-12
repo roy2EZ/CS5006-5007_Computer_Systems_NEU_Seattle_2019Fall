@@ -24,9 +24,12 @@ Hand* createHand() {
 // Destroys the hand, freeing any memory allocated for it.
 void destroyHand(Hand* thisHand) {
   if (!isHandEmpty(thisHand)) {
-    free(thisHand->firstCard->nextCard);
+    for (int i = 0; i < thisHand->num_cards_in_hand; i++) {
+      destroyCard(thisHand->firstCard->thisCard);
+      thisHand->firstCard = thisHand->firstCard->nextCard;
+    }
   }
-  free(thisHand->firstCard);
+  free(thisHand);
 }
 
 void addCardToHand(Card* card, Hand* thisHand) {
@@ -84,19 +87,19 @@ int isHandEmpty(Hand* thisHand) {
   return 0;
 }
 
-// Given a lead card, a players hand, and the card the player wants 
-// to play, is it legal? 
-// If the player has a card of the same suit as the leadCard, they 
-// must play a card of the same suit. 
-// If the player does not have a card of the same suit, they can 
-// play any card. 
+// Given a lead card, a players hand, and the card the player wants
+// to play, is it legal?
+// If the player has a card of the same suit as the leadCard, they
+// must play a card of the same suit.
+// If the player does not have a card of the same suit, they can
+// play any card.
 int isLegalMove(Hand *hand, Card *leadCard, Card *playedCard) {
   Suit leadSuit = leadCard->suit;
   if (playedCard->suit == leadSuit) {
     return 1;
   }
   CardNode* tempNode = hand->firstCard;
-  while(tempNode != NULL) {
+  while (tempNode != NULL) {
     if (tempNode->thisCard->suit == leadSuit) {
       return 0;
     }
@@ -105,10 +108,10 @@ int isLegalMove(Hand *hand, Card *leadCard, Card *playedCard) {
   return 1;
 }
 
-// Given two cards that are played in a hand, which one wins? 
-// If the suits are the same, the higher card value wins. 
-// If the suits are not the same, player 1 wins, unless player 2 played trump. 
-// Returns 1 if the person who led won, 0 if the person who followed won. 
+// Given two cards that are played in a hand, which one wins?
+// If the suits are the same, the higher card value wins.
+// If the suits are not the same, player 1 wins, unless player 2 played trump.
+// Returns 1 if the person who led won, 0 if the person who followed won.
 int whoWon(Card *leadCard, Card *followedCard, Suit trump) {
   if (leadCard->suit == followedCard->suit) {
     if (leadCard->name > followedCard->name) {
@@ -122,5 +125,11 @@ int whoWon(Card *leadCard, Card *followedCard, Suit trump) {
     } else {
       return 0;
     }
+  }
+}
+
+void returnHandToDeck(Hand *aHand, Deck *aDeck) {
+  while(!isHandEmpty(aHand)) {
+    pushCardToDeck(removeCardFromHand(aHand->firstCard->thisCard, aHand), aDeck);
   }
 }

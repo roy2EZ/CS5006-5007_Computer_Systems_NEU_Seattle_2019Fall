@@ -55,7 +55,7 @@ Card* popCardFromDeck(Deck* cardDeck) {
     return NULL;
   } else {
     // Get the top card from the cardDeck
-    // and remove the card from deck 
+    // and remove the card from deck
     // by minus the topCard with 1 which is topCard--
     return cardDeck->cards[cardDeck->topCard--];
   }
@@ -89,6 +89,9 @@ void destroyCard(Card* card) {
 // Game functions
 //----------------------------------------
 
+// Create a Deck for this game, and add any
+// needed cards to the deck.
+// Return a pointer to the deck to be used for the game
 Deck* populateDeck() {
   Deck* deck = createDeck();
   int i, j;
@@ -102,16 +105,31 @@ Deck* populateDeck() {
 
 // Shuffle the deck.
 // Put them in a random order.
-// My reference: 
+// My reference:
 // https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/
 void shuffle(Deck *thisDeck) {
   srand(time(0));
   int seed;
   for (int i = NUM_CARDS_IN_DECK-1; i > 0; i--) {
-    Card* tempCard = thisDeck->cards[i];
     int j = rand() % (i + 1);
+    Card* tempCard = thisDeck->cards[i];
     thisDeck->cards[i] = thisDeck->cards[j];
     thisDeck->cards[j] = tempCard;
+  }
+}
+
+// Given a deck (assume that it is already shuffled),
+// take the top card from the deck and alternately give
+// it to player 1 and player 2, until they both have
+// NUM_DECKS_IN_HAND.
+void deal(Deck *aDeck, Hand *p1hand, Hand *p2hand) {
+  while (p1hand->num_cards_in_hand < 5 || p2hand->num_cards_in_hand < 5) {
+    if (p1hand->num_cards_in_hand < 5) {
+      addCardToHand(popCardFromDeck(aDeck), p1hand);
+    }
+    if (p2hand->num_cards_in_hand < 5) {
+      addCardToHand(popCardFromDeck(aDeck), p2hand);
+    }
   }
 }
 
