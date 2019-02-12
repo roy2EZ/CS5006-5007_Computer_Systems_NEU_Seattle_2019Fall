@@ -4,9 +4,13 @@
 #include "a4.h"
 
 #define PRINT_DEBUG 1
+// Name: Rongyi Chen
+// Date: FEB 11, 2019
 
 // Put your deck functions in here
-
+//----------------------------------------
+// Deck functions
+//----------------------------------------
 Deck* createDeck() {
   // Allocate space on the heap
   Deck* newDeck = (Deck*)malloc(sizeof(Deck));
@@ -82,7 +86,7 @@ void destroyCard(Card* card) {
 }
 
 //----------------------------------------
-// Deck functions
+// Game functions
 //----------------------------------------
 
 Deck* populateDeck() {

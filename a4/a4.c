@@ -6,9 +6,14 @@
 #include "a4.h"
 
 #define PRINT_DEBUG 1
+// Name: Rongyi Chen
+// Date: FEB 11, 2019
 
 // Implement the Hand and other functions in here
 
+//----------------------------------------
+// Hand functions
+//----------------------------------------
 Hand* createHand() {
   Hand* newHand = (Hand*)malloc(sizeof(Hand));
   newHand->num_cards_in_hand = 0;
@@ -100,3 +105,22 @@ int isLegalMove(Hand *hand, Card *leadCard, Card *playedCard) {
   return 1;
 }
 
+// Given two cards that are played in a hand, which one wins? 
+// If the suits are the same, the higher card value wins. 
+// If the suits are not the same, player 1 wins, unless player 2 played trump. 
+// Returns 1 if the person who led won, 0 if the person who followed won. 
+int whoWon(Card *leadCard, Card *followedCard, Suit trump) {
+  if (leadCard->suit == followedCard->suit) {
+    if (leadCard->name > followedCard->name) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else {
+    if (followedCard->suit != trump) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+}

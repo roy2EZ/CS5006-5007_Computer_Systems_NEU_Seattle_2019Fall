@@ -425,9 +425,9 @@ void test_is_legal_move() {
 
   end_test();
 }
-/*
+
 void test_who_won() {
-  start_test("create_deck");
+  start_test("who_won");
 
   Card card1 = {QUEEN, HEARTS, -1};
   Card card2 = {KING, SPADES, -1};
@@ -442,7 +442,7 @@ void test_who_won() {
 
   end_test();
 }
-
+/*
 void test_get_best_move() {
   start_test("get_best_move");
   end_test();
@@ -476,8 +476,8 @@ int main(void) {
   test_deal();
   */
   test_is_legal_move();
-  /*
   test_who_won();
+  /*
   test_get_best_move();
   test_sort_hand();
   test_shuffle_hand();
