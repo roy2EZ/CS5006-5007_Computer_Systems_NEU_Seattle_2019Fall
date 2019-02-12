@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
 #include "a4.h"
 
 #define PRINT_DEBUG 1
@@ -99,3 +99,19 @@ Deck* populateDeck() {
     }
   }
 }
+
+// Shuffle the deck.
+// Put them in a random order.
+// My reference: 
+// https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/
+void shuffle(Deck *thisDeck) {
+  srand(time(0));
+  int seed;
+  for (int i = NUM_CARDS_IN_DECK-1; i > 0; i--) {
+    Card* tempCard = thisDeck->cards[i];
+    int j = rand() % (i + 1);
+    thisDeck->cards[i] = thisDeck->cards[j];
+    thisDeck->cards[j] = tempCard;
+  }
+}
+

@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +6,8 @@
 
 #define assert(EXPRESSION) ((EXPRESSION) ? _assert_pass(#EXPRESSION, __FILE__, __LINE__) : \
                                            _assert_fail(#EXPRESSION, __FILE__, __LINE__))
-
+// Name: Rongyi Chen
+// Date: FEB 11, 2019
 void _assert_fail(const char* expression, const char* file, int line) {
   fprintf(stderr, "\n**** Assertion '%s' FAILED, file '%s' line '%d' *******.\n", expression, file, line);
 }
@@ -227,13 +229,20 @@ void test_is_deck_empty() {
 
   end_test();
 }
-/*
+
 void test_shuffle() {
   start_test("test_shuffle");
 
+  Deck *deck = populateDeck();
+  printf("Deck before shuffle: \n");
+  printDeck(deck); 
+  shuffle(deck);
+  printf("Deck after shuffle: \n");
+  printDeck(deck);
+  
   end_test();
 }
-*/
+
 void test_add_card_to_hand() {
   start_test("add_card_to_hand");
 
@@ -467,9 +476,7 @@ int main(void) {
   test_peek_at_top_card();
   test_pop_card_from_deck();
   test_is_deck_empty();
-  /*
   test_shuffle();
-  */
   test_add_card_to_hand();
   test_remove_card_from_hand();
   /*
