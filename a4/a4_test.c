@@ -387,7 +387,7 @@ void test_deal() {
   destroyHand(hand1);
   destoryHand(hand2); 
 }
-
+*/
 void test_is_legal_move() {
   start_test("is_legal_move");
 
@@ -425,7 +425,7 @@ void test_is_legal_move() {
 
   end_test();
 }
-
+/*
 void test_who_won() {
   start_test("create_deck");
 
@@ -474,7 +474,9 @@ int main(void) {
   test_remove_card_from_hand();
   /*
   test_deal();
+  */
   test_is_legal_move();
+  /*
   test_who_won();
   test_get_best_move();
   test_sort_hand();

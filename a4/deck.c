@@ -16,17 +16,6 @@ Deck* createDeck() {
   return newDeck;
 }
 
-Deck* populateDeck() {
-  Deck* deck = createDeck();
-  int i, j;
-  for (i = HEARTS; i <= DIAMONDS; i++) {
-    for (j = NINE; j <= ACE; j++) {
-      Card *card = createCard(i, j);
-      pushCardToDeck(card, deck);
-    }
-  }
-}
-
 void destroyDeck(Deck* deck) {
   if (isDeckEmpty(deck) == 0) {
     for (int i = 0; i < NUM_CARDS_IN_DECK; i++) {
@@ -90,4 +79,19 @@ Card* createCard(Suit suit, Name name) {
 
 void destroyCard(Card* card) {
   free(card);
+}
+
+//----------------------------------------
+// Deck functions
+//----------------------------------------
+
+Deck* populateDeck() {
+  Deck* deck = createDeck();
+  int i, j;
+  for (i = HEARTS; i <= DIAMONDS; i++) {
+    for (j = NINE; j <= ACE; j++) {
+      Card *card = createCard(i, j);
+      pushCardToDeck(card, deck);
+    }
+  }
 }

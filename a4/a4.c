@@ -78,3 +78,25 @@ int isHandEmpty(Hand* thisHand) {
   }
   return 0;
 }
+
+// Given a lead card, a players hand, and the card the player wants 
+// to play, is it legal? 
+// If the player has a card of the same suit as the leadCard, they 
+// must play a card of the same suit. 
+// If the player does not have a card of the same suit, they can 
+// play any card. 
+int isLegalMove(Hand *hand, Card *leadCard, Card *playedCard) {
+  Suit leadSuit = leadCard->suit;
+  if (playedCard->suit == leadSuit) {
+    return 1;
+  }
+  CardNode* tempNode = hand->firstCard;
+  while(tempNode != NULL) {
+    if (tempNode->thisCard->suit == leadSuit) {
+      return 0;
+    }
+    tempNode = tempNode->nextCard;
+  }
+  return 1;
+}
+
