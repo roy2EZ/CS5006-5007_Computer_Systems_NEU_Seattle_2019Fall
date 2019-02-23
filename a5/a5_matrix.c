@@ -121,4 +121,20 @@ Graph* create_example_graph()
     return pG;
 }
 
+/*
+ * return the first adjacency vertex of v,  return -1 otherwise 
+ */
+static int first_vertex(Graph G, int v)
+{
+    int i;
+
+    if (v<0 || v>(G.vexnum-1))
+        return -1;
+
+    for (i = 0; i < G.vexnum; i++)
+        if (G.matrix[v][i]!=0 && G.matrix[v][i]!=-1)
+            return i;
+
+    return -1;
+}
 
