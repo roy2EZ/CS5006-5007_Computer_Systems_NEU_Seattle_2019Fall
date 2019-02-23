@@ -155,3 +155,80 @@ static int next_vertix(Graph G, int v, int w)
     return -1;
 }
 
+
+/*
+ * Dijkstra
+ * G -- the graph
+ * vs -- start vertex
+ * prev -- prev[i] is the vertex before i, in all vertexs in the shortest path from vs to i
+ * dist -- dist[i] is the distance of the shortest path from vs to i
+ */
+void dijkstra(Graph G, int vs, int prev[], int dist[])
+{
+    int i,j,k;
+    int min;
+    int tmp;
+    int flag[MAX];      // flag[i] = 1 means got the shortest path from vs to i
+    
+    // init
+    for (i = 0; i < G.vexnum; i++)
+    {
+        // the shortest path to i did not get yet
+        flag[i] = 0;     
+        // prev of i is 0         
+        prev[i] = 0;
+        // the shortest path to i is the cost(distance) from vs to i          
+        dist[i] = G.matrix[vs][i];
+    }
+
+    // init vs
+    flag[vs] = 1;
+    dist[vs] = 0;
+
+    // traversing G.vexnum-1 times, each time find a shortest path to a vertex
+    for (i = 1; i < G.vexnum; i++)
+    {
+        // find shortest path to current vertex
+        // which means in the unupdated vertexs, find the closest vertex k
+        min = -1;
+        for (j = 0; j < G.vexnum; j++)
+        {
+            if (flag[j]==0 && dist[j]<min)
+            {
+                min = dist[j];
+                k = j;
+            }
+        }
+        // mark k as the gotten shortest path
+        flag[k] = 1;
+
+        // update current shortest path and prev vertex
+        for (j = 0; j < G.vexnum; j++)
+        {
+            tmp = (G.matrix[k][j]== -1 ? -1 : (min + G.matrix[k][j])); 
+            if (flag[j] == 0 && (tmp  < dist[j]) )
+            {
+                dist[j] = tmp;
+                prev[j] = k;
+            }
+        }
+    }
+
+    // print result
+    printf("dijkstra(%c): \n", G.vexs[vs]);
+    for (i = 0; i < G.vexnum; i++)
+        printf("  shortest(%c, %c)=%d\n", G.vexs[vs], G.vexs[i], dist[i]);
+}
+
+
+void main()
+{
+    int prev[MAX] = {0};
+    int dist[MAX] = {0};
+    Graph* pG;
+    //create the graph from the csv file
+    pG = create_example_graph();
+    // dijkstra算法获取"第4个顶点"到其它各个顶点的最短距离
+    dijkstra(*pG, 4, prev, dist);
+}
+
