@@ -138,3 +138,20 @@ static int first_vertex(Graph G, int v)
     return -1;
 }
 
+/*
+ * return next index of w to v, return -1 otherwise
+ */
+static int next_vertix(Graph G, int v, int w)
+{
+    int i;
+
+    if (v<0 || v>(G.vexnum-1) || w<0 || w>(G.vexnum-1))
+        return -1;
+
+    for (i = w + 1; i < G.vexnum; i++)
+        if (G.matrix[v][i]!=0 && G.matrix[v][i]!= (-1))
+            return i;
+
+    return -1;
+}
+
