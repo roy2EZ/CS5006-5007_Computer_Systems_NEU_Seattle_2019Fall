@@ -37,3 +37,88 @@ static int get_position(Graph G, char ch)
     return -1;
 }
 
+
+/*
+ * read a char
+ */
+static char read_char()
+{
+    char ch;
+
+    do {
+        ch = getchar();
+    } while(!isLetter(ch));
+
+    return ch;
+}
+
+/*
+ * create the graph from csv
+ */
+Graph* create_example_graph()
+{
+    char file_name[] = "miles_graph_FINAL.csv";
+    FILE *fp;
+    fp = fopen(file_name, "r");
+    
+    if (!fp) {
+        fprintf(stderr, "failed to open file for reading\n");
+    }
+
+    char line[MAX];
+    char *result = NULL;
+    fgets(line, MAX, fp);
+    char vexs[MAX];
+    int matrix[MAX][MAX];
+
+    while(fgets(line, MAX, fp) != NULL) {
+        
+        result = strtok(line, ",");
+        int i = 0;
+	int j = 0;
+        while( result != NULL ) {
+            if (i=0) {
+                vexs[i] = *result;
+                
+            }
+            else{
+
+                matrix[j][i] = *result;
+                i++;
+            }
+            result = strtok(NULL, ",");
+            j++;
+        }
+    }
+    
+    int vlen = LENGTH(vexs);
+    int i, j;
+    Graph* pG;
+    
+    // input the number of vex and edge
+    if ((pG=(Graph*)malloc(sizeof(Graph))) == NULL )
+        return NULL;
+    memset(pG, 0, sizeof(Graph));
+
+    // init the vexnum
+    pG->vexnum = vlen;
+    // init the vexs
+    for (i = 0; i < pG->vexnum; i++)
+        pG->vexs[i] = vexs[i];
+
+    // init the edge
+    for (i = 0; i < pG->vexnum; i++)
+        for (j = 0; j < pG->vexnum; j++)
+            pG->matrix[i][j] = matrix[i][j];
+
+    // count amount of
+    for (i = 0; i < pG->vexnum; i++)
+        for (j = 0; j < pG->vexnum; j++)
+            if (i!=j && pG->matrix[i][j]!=-1)
+                pG->edgnum++;
+    pG->edgnum /= 2;
+
+    return pG;
+}
+
+
