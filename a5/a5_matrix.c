@@ -25,3 +25,15 @@ typedef struct _EdgeData
     int weight; // weight of edge
 }EData;
 
+/*
+ * return the position of char ch in the matrix 
+ */
+static int get_position(Graph G, char ch)
+{
+    int i;
+    for(i=0; i<G.vexnum; i++)
+        if(G.vexs[i]==ch)
+            return i;
+    return -1;
+}
+
