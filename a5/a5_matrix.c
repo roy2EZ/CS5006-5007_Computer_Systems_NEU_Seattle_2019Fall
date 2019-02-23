@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define MAX         1001                 // Max line value
-
+#define INF         (~(0x1<<31))
 #define isLetter(a) ((((a)>='a')&&((a)<='z')) || (((a)>='A')&&((a)<='Z')))
 #define LENGTH(a)   (sizeof(a)/sizeof(a[0]))
 
@@ -55,7 +55,7 @@ static char read_char()
 /*
  * create the graph from csv
  */
-Graph* create_example_graph()
+Graph* create_graph()
 {
     char file_name[] = "miles_graph_FINAL.csv";
     FILE *fp;
@@ -77,18 +77,21 @@ Graph* create_example_graph()
         int i = 0;
 	int j = 0;
         while( result != NULL ) {
-            if (i=0) {
-                vexs[i] = *result;
-                
-            }
-            else{
-
-                matrix[j][i] = *result;
-                i++;
+            if (j == 0) {
+                vexs[j] = *result;
+            } else {
+                if (atoi(result) == -1) {
+                matrix[i][j] = INF;
+                } else if (*result == '\040') {
+                  matrix[i][j] = 0;
+                } else {
+                matrix[i][j] = atoi(result);
+                }
+                j++;
             }
             result = strtok(NULL, ",");
-            j++;
         }
+        i++;
     }
     
     int vlen = LENGTH(vexs);
@@ -114,7 +117,7 @@ Graph* create_example_graph()
     // count amount of
     for (i = 0; i < pG->vexnum; i++)
         for (j = 0; j < pG->vexnum; j++)
-            if (i!=j && pG->matrix[i][j]!=-1)
+            if (i!=j && pG->matrix[i][j]!=INF)
                 pG->edgnum++;
     pG->edgnum /= 2;
 
@@ -132,7 +135,7 @@ static int first_vertex(Graph G, int v)
         return -1;
 
     for (i = 0; i < G.vexnum; i++)
-        if (G.matrix[v][i]!=0 && G.matrix[v][i]!=-1)
+        if (G.matrix[v][i]!=0 && G.matrix[v][i]!=INF)
             return i;
 
     return -1;
@@ -149,7 +152,7 @@ static int next_vertix(Graph G, int v, int w)
         return -1;
 
     for (i = w + 1; i < G.vexnum; i++)
-        if (G.matrix[v][i]!=0 && G.matrix[v][i]!= (-1))
+        if (G.matrix[v][i]!=0 && G.matrix[v][i]!=INF)
             return i;
 
     return -1;
@@ -163,7 +166,7 @@ static int next_vertix(Graph G, int v, int w)
  * prev -- prev[i] is the vertex before i, in all vertexs in the shortest path from vs to i
  * dist -- dist[i] is the distance of the shortest path from vs to i
  */
-void dijkstra(Graph G, int vs, int prev[], int dist[])
+void dijkstra(Graph G, int vs, int end, int prev[], int dist[])
 {
     int i,j,k;
     int min;
@@ -190,7 +193,7 @@ void dijkstra(Graph G, int vs, int prev[], int dist[])
     {
         // find shortest path to current vertex
         // which means in the unupdated vertexs, find the closest vertex k
-        min = -1;
+        min = INF;
         for (j = 0; j < G.vexnum; j++)
         {
             if (flag[j]==0 && dist[j]<min)
@@ -205,7 +208,7 @@ void dijkstra(Graph G, int vs, int prev[], int dist[])
         // update current shortest path and prev vertex
         for (j = 0; j < G.vexnum; j++)
         {
-            tmp = (G.matrix[k][j]== -1 ? -1 : (min + G.matrix[k][j])); 
+            tmp = (G.matrix[k][j] == INF ? INF : (min + G.matrix[k][j])); 
             if (flag[j] == 0 && (tmp  < dist[j]) )
             {
                 dist[j] = tmp;
@@ -215,9 +218,7 @@ void dijkstra(Graph G, int vs, int prev[], int dist[])
     }
 
     // print result
-    printf("dijkstra(%c): \n", G.vexs[vs]);
-    for (i = 0; i < G.vexnum; i++)
-        printf("  shortest(%c, %c)=%d\n", G.vexs[vs], G.vexs[i], dist[i]);
+    printf("%d\n", dist[end]);
 }
 
 
@@ -227,8 +228,12 @@ void main()
     int dist[MAX] = {0};
     Graph* pG;
     //create the graph from the csv file
-    pG = create_example_graph();
-    // dijkstra算法获取"第4个顶点"到其它各个顶点的最短距离
-    dijkstra(*pG, 4, prev, dist);
+    pG = create_graph();
+    // dijkstra got the shortest path from Seattle_WA to Boston_MA
+    printf("The shortest path from Seattle_WA to Boston_MA: \n");
+    dijkstra(*pG, 824, 97, prev, dist);
+    // dijkstra got the shortest path from Minneapolis_MN to Ann Arbor_MI
+    printf("The shortest path from Minneapolis_MN to Ann Arbor_MI: \n");
+    dijkstra(*pG, 573, 28, prev, dist);
 }
 
