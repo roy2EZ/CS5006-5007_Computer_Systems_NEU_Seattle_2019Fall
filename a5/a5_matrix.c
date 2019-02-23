@@ -1,3 +1,10 @@
+/**
+ * Dijkstra get shortest path with Adjacency Matrix 
+ * @author Rongyi Chen
+ * @date 2019/02/22
+ * @reference https://www.cnblogs.com/skywang12345/p/3711512.html#anchor3
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>

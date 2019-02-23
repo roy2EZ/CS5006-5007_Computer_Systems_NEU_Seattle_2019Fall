@@ -1,3 +1,10 @@
+/**
+ * Dijkstra get shortest path with Adjacency List
+ * @author Rongyi Chen
+ * @date 2019/02/22
+ * @reference https://www.cnblogs.com/skywang12345/p/3711512.html#anchor3
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -22,3 +29,10 @@ typedef struct _VNode
     char data;              // data of vertex
     ENode *first_edge;      // pointer to the first edge to this vertex
 }VNode;
+
+typedef struct _LGraph
+{
+    int vexnum;             // 图的顶点的数目
+    int edgnum;             // 图的边的数目
+    VNode vexs[MAX];
+}LGraph;
