@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define MAX         1001                 // Max line value
-#define INF         (~(0x1<<31))
+#define INF         (~(0x1<<31)) //
 #define isLetter(a) ((((a)>='a')&&((a)<='z')) || (((a)>='A')&&((a)<='Z')))
 #define LENGTH(a)   (sizeof(a)/sizeof(a[0]))
 
@@ -218,7 +218,7 @@ void dijkstra(Graph G, int vs, int end, int prev[], int dist[])
     }
 
     // print result
-    printf("%d\n", dist[end]);
+    printf("%d miles\n", dist[end]);
 }
 
 
@@ -230,10 +230,10 @@ void main()
     //create the graph from the csv file
     pG = create_graph();
     // dijkstra got the shortest path from Seattle_WA to Boston_MA
-    printf("The shortest path from Seattle_WA to Boston_MA: \n");
+    printf("Seattle to Boston: ");
     dijkstra(*pG, 824, 97, prev, dist);
     // dijkstra got the shortest path from Minneapolis_MN to Ann Arbor_MI
-    printf("The shortest path from Minneapolis_MN to Ann Arbor_MI: \n");
+    printf("Minneapolis to Ann Arbor: ");
     dijkstra(*pG, 573, 28, prev, dist);
 }
 
