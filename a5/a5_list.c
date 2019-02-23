@@ -82,57 +82,57 @@ LGraph* create_lgraph()
 {
     // get vertex from nodes.csv
     static char gVexs[1000];     
-    char file_name[] = "nodes.csv";
-    FILE *fp;
-    fp = fopen(file_name, "r");
-    if (!fp) {
+    char file_name_node[] = "nodes.csv";
+    FILE *fp1;
+    fp1 = fopen(file_name_node, "r");
+    if (!fp1) {
         fprintf(stderr, "failed to open file for reading\n");
     }
-    char line[1001];
-    char *result = NULL;
-    fgets(line, MAX, fp); // skip first line
-    while(fgets(line, MAX, fp) != NULL) {
-        result = strtok(line, ",");
+    char line1[1001];
+    char *result1 = NULL;
+    fgets(line1, MAX, fp1); // skip first line
+    while(fgets(line1, MAX, fp1) != NULL) {
+        result1 = strtok(line1, ",");
         int i = 0;
-        while( result != NULL ) {
+        while( result1 != NULL ) {
             if (i == 1) {
-                gVexs[i] = *result;
+                gVexs[i] = *result1;
             } else {
                 i++;
             }
-            result = strtok(NULL, ",");
+            result1 = strtok(NULL, ",");
         }
     }
-    fclose (fp);
+    fclose(fp1);
     
     // get edge from edges_FINAL.csv
-    static EData gEdges[MAX][MAX];
-    char file_name[] = "edges_FINAL.csv";
-    FILE *fp;
-    fp = fopen(file_name, "r");
-    if (!fp) {
+    static EData gEdges[MAX];
+    char file_name_edge[] = "edges_FINAL.csv";
+    FILE *fp2;
+    fp2 = fopen(file_name_edge, "r");
+    if (!fp2) {
         fprintf(stderr, "failed to open file for reading\n");
     }
-    char line[MAX];
-    char *result = NULL;
-    fgets(line, MAX, fp);// skip first line
+    char line2[MAX];
+    char *result2 = NULL;
+    fgets(line2, MAX, fp2);// skip first line
 
-    while(fgets(line, MAX, fp) != NULL) {
-        result = strtok(line, " ");
-        int i, j = 0;
-        while( result != NULL ) {
-          if (j == 0 or j == 1) {
-            gEdges[i][j] = *result;
+    while(fgets(line2, MAX, fp2) != NULL) {
+        result2 = strtok(line2, " ");
+        int i= 0;
+        while( result2 != NULL ) {
+          if (i == 0) {
+            gEdges[i].start = *result2;
+          } else if (i == 1) {
+            gEdges[i].end = *result2;
           } else {
-            gEdges[i][j] = atoi(result);
+            gEdges[i].weight = atoi(result2);
           }
-          j++;
+          i++;
         }
-        result = strtok(NULL, ",");
-      }
-      i++;
+        result2 = strtok(NULL, ",");
     }    
-    fclose (fp);
+    fclose(fp2);
 
     char c1, c2;
     int vlen = 1000;
@@ -141,7 +141,6 @@ LGraph* create_lgraph()
     int weight;
     ENode *node1, *node2;
     LGraph* pG;
-
 
     if ((pG=(LGraph*)malloc(sizeof(LGraph))) == NULL )
         return NULL;
@@ -194,3 +193,105 @@ LGraph* create_lgraph()
 
     return pG;
 }
+
+/*
+ * get weight of time from start to end of the edge, if start to end is not connected, return INF
+ */
+int get_weight(LGraph G, int start, int end)
+{
+    ENode *node;
+
+
+    if (start==end)
+        return 0;
+
+
+    node = G.vexs[start].first_edge;
+    while (node!=NULL)
+    {
+        if (end==node->ivex)
+            return node->weight;
+        node = node->next_edge;
+    }
+
+
+    return INF;
+}
+
+/*
+ * Dijkstra
+ * G -- the graph
+ * vs -- start vertex
+ * prev -- prev[i] is the vertex before i, in all vertexs in the shortest path from vs to i
+ * time -- time[i] is the time of the shortest path from vs to i
+ */
+void dijkstra(LGraph G, int vs, int end, int prev[], int time[])
+{
+    int i,j,k;
+    int min;
+    int tmp;
+    int flag[MAX];      // flag[i] = 1 means got the shortest path from vs to i
+    
+    // init
+    for (i = 0; i < G.vexnum; i++)
+    {
+        // the shortest path to i did not get yet
+        flag[i] = 0;
+        // prev of i is 0 
+        prev[i] = 0;
+        // the shortest path to i is the cost(time) from vs to i
+        time[i] = get_weight(G, vs, i);
+    }
+
+    // init vs
+    flag[vs] = 1;
+    time[vs] = 0;
+
+    // traversing G.vexnum-1 times, each time find a shortest path to a vertex
+    for (i = 1; i < G.vexnum; i++)
+    {
+        // find shortest path to current vertex
+        // which means in the unupdated vertexs, find the closest vertex k
+        min = INF;
+        for (j = 0; j < G.vexnum; j++)
+        {
+            if (flag[j]==0 && time[j]<min)
+            {
+                min = time[j];
+                k = j;
+            }
+        }
+        // mark k as the gotten shortest path
+        flag[k] = 1;
+        // update current shortest path and prev vertex
+        for (j = 0; j < G.vexnum; j++)
+        {
+            tmp = get_weight(G, k, j);
+            tmp = (tmp==INF ? INF : (min + tmp));
+            if (flag[j] == 0 && (tmp  < time[j]) )
+            {
+                time[j] = tmp;
+                prev[j] = k;
+            }
+        }
+    }
+
+    // print result
+    printf("%d \n", time[end]);
+}
+
+void main()
+{
+    int prev[MAX] = {0};
+    int dist[MAX] = {0};
+    LGraph* pG;
+    //create the graph from the csv file
+    pG = create_lgraph();
+    // dijkstra got the shortest path from Seattle_WA to Boston_MA
+    printf("Shortest time Seattle to Boston: ");
+    dijkstra(*pG, 824, 97, prev, dist);
+    // dijkstra got the shortest path from Minneapolis_MN to Ann Arbor_MI
+    printf("Shortest time Minneapolis to Ann Arbor: ");
+    dijkstra(*pG, 573, 28, prev, dist);
+}
+

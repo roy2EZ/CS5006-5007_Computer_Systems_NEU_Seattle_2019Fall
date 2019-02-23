@@ -74,7 +74,7 @@ Graph* create_graph()
 
     char line[MAX];
     char *result = NULL;
-    fgets(line, MAX, fp);
+    fgets(line, MAX, fp);// skip first line
     char vexs[MAX];
     int matrix[MAX][MAX];
 
@@ -99,8 +99,9 @@ Graph* create_graph()
             result = strtok(NULL, ",");
         }
         i++;
-    }
-    
+    }    
+    fclose(fp);
+
     int vlen = LENGTH(vexs);
     int i, j;
     Graph* pG;
@@ -187,7 +188,7 @@ void dijkstra(Graph G, int vs, int end, int prev[], int dist[])
         flag[i] = 0;     
         // prev of i is 0         
         prev[i] = 0;
-        // the shortest path to i is the cost(distance) from vs to i          
+        // the shortest path to i is the cost(distance) from vs to i
         dist[i] = G.matrix[vs][i];
     }
 
@@ -211,7 +212,6 @@ void dijkstra(Graph G, int vs, int end, int prev[], int dist[])
         }
         // mark k as the gotten shortest path
         flag[k] = 1;
-
         // update current shortest path and prev vertex
         for (j = 0; j < G.vexnum; j++)
         {
