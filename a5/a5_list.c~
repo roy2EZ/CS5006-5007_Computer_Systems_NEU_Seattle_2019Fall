@@ -1,9 +1,0 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <malloc.h>
-#include <string.h>
-
-#define MAX         100
-#define INF         (~(0x1<<31))        // 最大值(即0X7FFFFFFF)
-#define isLetter(a) ((((a)>='a')&&((a)<='z')) || (((a)>='A')&&((a)<='Z')))
-#define LENGTH(a)   (sizeof(a)/sizeof(a[0]))
