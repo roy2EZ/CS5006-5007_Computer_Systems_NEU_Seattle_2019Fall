@@ -1,4 +1,6 @@
 #!/bin/sh
+# author:Rongyi Chen
+# date:3/9/2019
 
 # Number of cores (includes those reported by hyper-threading cores)
 # Linux: Simply count the number of (non-comment) output lines from `lscpu -p`, 
