@@ -13,6 +13,9 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //  General Public License for more details.
 
+// homework from: Rongyi Chen
+// date:3/10/2019
+
 #include "LinkedList.h"
 #include "LinkedList_priv.h"
 #include "Assert007.h"
@@ -42,8 +45,16 @@ int DestroyLinkedList(LinkedList list,
 
   // Step 2.
   // Free the payloads, as well as the nodes 
-
-    return 0;
+  while (list->head != NULL) {
+    LinkedListNodePtr headNode = list->head;
+    list->head = headNode->next;
+    // use payload_free_function to free the payload
+    payload_free_function(headNode->payload);
+    // then free the node
+    free(headNode);
+  }
+  free(list);
+  return 0;
 }
 
 unsigned int NumElementsInLinkedList(LinkedList list) {
