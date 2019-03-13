@@ -125,21 +125,21 @@ int AppendLinkedList(LinkedList list, void *data) {
   // InsertLinkedList, but add to the end instead of the beginning.
 
   // create a new list
-  LinkedListNodePtr newList = (LinkedListNodePtr) malloc(sizeof(LinkedListNode));
-  if (newList == NULL) {
+  LinkedListNodePtr newListNode = (LinkedListNodePtr) malloc(sizeof(LinkedListNode));
+  if (newListNode == NULL) {
     // out of memory
     return 1;
   }  
   
   // Set the payload
-  newList->payload = payload;
+  newListNode->payload = payload;
   
   // case1: list is currently empty
   if (list->num_elements == 0) {
     Assert007(list->head == NULL);  
     Assert007(list->tail == NULL);  
-    newList->next = newList->prev = NULL;
-    list->head = list->tail = newList;
+    newListNode->next = newListNode->prev = NULL;
+    list->head = list->tail = newListNode;
     list->num_elements = 1U;
     return 0;
   }
@@ -148,10 +148,10 @@ int AppendLinkedList(LinkedList list, void *data) {
   if (list->num_elements >= 1) {
     Assert007(list->head != NULL);  
     Assert007(list->tail != NULL);  
-    list->tail->next = newList;
-    newList->next = NULL;
-    newList->prev = list->tail;
-    list->tail = newList;
+    list->tail->next = newListNode;
+    newListNode->next = NULL;
+    newListNode->prev = list->tail;
+    list->tail = newListNode;
     list->num_elements++;
     return 0;
   } 
