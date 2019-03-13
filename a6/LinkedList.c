@@ -112,7 +112,7 @@ int InsertLinkedList(LinkedList list, void *data) {
     new_node->prev = NULL;
     new_node->next = list->head;
     list->head = new_node;
-    list->num_elements += 1;
+    list->num_elements++;
     return 0;
   } 
   return 0;
@@ -138,7 +138,29 @@ int PopLinkedList(LinkedList list, void **data) {
   // Be sure to call free() to deallocate the memory that was
   // previously allocated by InsertLinkedList().
 
-    return 0; 
+  // empty list return 1
+  if (list->num_elements == 0) {
+    return 1;
+  }
+    
+  *payload_ptr = list->head->payload;
+
+  //If the list is non-empty, there are two cases to consider:
+  if (list->num_elements == 1) { 
+    // case(a): a list with a single element in it
+    list->tail = NULL;
+    free(list->head);
+    list->head = NULL;
+  } else if (list->num_elements >= 2) {
+    // case(b): general case of a list with >=2 elements in it
+    LinkedListNodePtr headnode = list->head;
+    list->head = headnode->next;
+    list->head->prev = NULL;
+    free(headnode);
+    headnode = NULL;
+  }
+  list->num_elements--;
+  return 0; 
 }
 
 int SliceLinkedList(LinkedList list, void **data) {
