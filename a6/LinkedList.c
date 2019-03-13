@@ -105,9 +105,17 @@ int InsertLinkedList(LinkedList list, void *data) {
   
   // Step 3.
   // typical case; list has >=1 elements
-  
-  
+  if (list->num_elements >= 1) {
+    Assert007(list->head != NULL);
+    Assert007(list->tail != NULL);
+    list->head->prev = new_node;
+    new_node->prev = NULL;
+    new_node->next = list->head;
+    list->head = new_node;
+    list->num_elements += 1;
     return 0;
+  } 
+  return 0;
 }
 
 int AppendLinkedList(LinkedList list, void *data) {
