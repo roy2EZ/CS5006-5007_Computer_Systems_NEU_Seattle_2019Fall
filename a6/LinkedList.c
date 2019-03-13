@@ -123,7 +123,39 @@ int AppendLinkedList(LinkedList list, void *data) {
 
   // Step 5: implement AppendLinkedList.  It's kind of like
   // InsertLinkedList, but add to the end instead of the beginning.
+
+  // create a new list
+  LinkedListNodePtr newList = (LinkedListNodePtr) malloc(sizeof(LinkedListNode));
+  if (newList == NULL) {
+    // out of memory
+    return 1;
+  }  
   
+  // Set the payload
+  newList->payload = payload;
+  
+  // case1: list is currently empty
+  if (list->num_elements == 0) {
+    Assert007(list->head == NULL);  
+    Assert007(list->tail == NULL);  
+    newList->next = newList->prev = NULL;
+    list->head = list->tail = newList;
+    list->num_elements = 1U;
+    return 0;
+  }
+
+  // case2: list has >=1 elements
+  if (list->num_elements >= 1) {
+    Assert007(list->head != NULL);  
+    Assert007(list->tail != NULL);  
+    list->tail->next = newList;
+    newList->next = NULL;
+    newList->prev = list->tail;
+    list->tail = newList;
+    list->num_elements++;
+    return 0;
+  } 
+
   return 0;
 }
 
