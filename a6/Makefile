@@ -117,6 +117,10 @@ hello: hello_world.c hello_world.h
 	gcc -g -o hello_world hello_world.c
 
 info: system_info.sh
+	@echo ==========================
+	@echo Run system_info.sh
+	@echo ==========================
+	chmod +x system_info.sh
 	./system_info.sh
 
 .PHONY: clean 
