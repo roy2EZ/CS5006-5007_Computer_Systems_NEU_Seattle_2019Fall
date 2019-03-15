@@ -124,22 +124,15 @@ int AppendLinkedList(LinkedList list, void *data) {
   // Step 5: implement AppendLinkedList.  It's kind of like
   // InsertLinkedList, but add to the end instead of the beginning.
 
-  // create a new list
-  LinkedListNodePtr newListNode = (LinkedListNodePtr) malloc(sizeof(LinkedListNode));
-  if (newListNode == NULL) {
-    // out of memory
-    return 1;
-  }  
-  
-  // Set the payload
-  newListNode->payload = payload;
-  
+  LinkedListNodePtr new_node = CreateLinkedListNode(data);
+ 
   // case1: list is currently empty
   if (list->num_elements == 0) {
     Assert007(list->head == NULL);  
     Assert007(list->tail == NULL);  
-    newListNode->next = newListNode->prev = NULL;
-    list->head = list->tail = newListNode;
+    new_node->next = NULL;
+    new_node->prev = NULL;
+    list->head = list->tail = new_node;
     list->num_elements = 1U;
     return 0;
   }
@@ -148,10 +141,10 @@ int AppendLinkedList(LinkedList list, void *data) {
   if (list->num_elements >= 1) {
     Assert007(list->head != NULL);  
     Assert007(list->tail != NULL);  
-    list->tail->next = newListNode;
-    newListNode->next = NULL;
-    newListNode->prev = list->tail;
-    list->tail = newListNode;
+    list->tail->next = new_node;
+    new_node->next = NULL;
+    new_node->prev = list->tail;
+    list->tail = new_node;
     list->num_elements++;
     return 0;
   } 
@@ -174,9 +167,8 @@ int PopLinkedList(LinkedList list, void **data) {
   if (list->num_elements == 0) {
     return 1;
   }
-    
-  *payload_ptr = list->head->payload;
-
+  *data = list->head->payload;
+  LinkedListNodePtr headnode = list->head;
   //If the list is non-empty, there are two cases to consider:
   if (list->num_elements == 1) { 
     // case(a): a list with a single element in it
@@ -185,7 +177,6 @@ int PopLinkedList(LinkedList list, void **data) {
     list->head = NULL;
   } else if (list->num_elements >= 2) {
     // case(b): general case of a list with >=2 elements in it
-    LinkedListNodePtr headnode = list->head;
     list->head = headnode->next;
     list->head->prev = NULL;
     free(headnode);
