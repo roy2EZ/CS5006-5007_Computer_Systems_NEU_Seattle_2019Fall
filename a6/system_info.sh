@@ -1,14 +1,12 @@
 #!/bin/sh
 # author:Rongyi Chen
 # date:3/9/2019
-# reference:
+# I used the following resources to implement this code:
 # https://stackoverflow.com/a/23378780
 # https://unix.stackexchange.com/a/119170
 
 # get the number of cores 
-coresCount=$([ $(uname) = 'Darwin' ] &&
-		 sysctl -n hw.logicalcpu_max ||
-		     lscpu -p | egrep -v '^#' | wc -l)
+coresCount=$(nproc)
 # get the free memory
 freeMemory=$(free -m | awk 'NR==2{printf "%s MB(free)/%s MB(total)\n", $2-$3,$2 }')
 
