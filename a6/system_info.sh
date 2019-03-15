@@ -2,7 +2,7 @@
 # author:Rongyi Chen
 # date:3/9/2019
 # I used the following resources to implement this code:
-# https://stackoverflow.com/a/23378780
+# https://askubuntu.com/a/724236
 # https://unix.stackexchange.com/a/119170
 
 # get the number of cores 
