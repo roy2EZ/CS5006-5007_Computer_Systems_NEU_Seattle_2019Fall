@@ -14,7 +14,7 @@
 //  General Public License for more details.
 
 // homework from: Rongyi Chen
-// date:3/15/2019
+// date:3/16/2019
 
 #include "LinkedList.h"
 #include "LinkedList_priv.h"
@@ -93,7 +93,7 @@ int InsertLinkedList(LinkedList list, void *data) {
     return 1; 
   }
   
-  if (list->num_elements == 0) {
+  if (NumElementsInLinkedList(list) == 0) {
     Assert007(list->head == NULL);  // debugging aid
     Assert007(list->tail == NULL);  // debugging aid
     list->head = new_node;
@@ -105,7 +105,7 @@ int InsertLinkedList(LinkedList list, void *data) {
   
   // Step 3.
   // typical case; list has >=1 elements
-  if (list->num_elements >= 1) {
+  if (NumElementsInLinkedList(list) >= 1) {
     Assert007(list->head != NULL);
     Assert007(list->tail != NULL);
     list->head->prev = new_node;
@@ -127,7 +127,7 @@ int AppendLinkedList(LinkedList list, void *data) {
   LinkedListNodePtr new_node = CreateLinkedListNode(data);
  
   // case1: list is currently empty
-  if (list->num_elements == 0) {
+  if (NumElementsInLinkedList(list) == 0) {
     Assert007(list->head == NULL);  
     Assert007(list->tail == NULL);  
     new_node->next = NULL;
@@ -138,7 +138,7 @@ int AppendLinkedList(LinkedList list, void *data) {
   }
 
   // case2: list has >=1 elements
-  if (list->num_elements >= 1) {
+  if (NumElementsInLinkedList(list) >= 1) {
     Assert007(list->head != NULL);  
     Assert007(list->tail != NULL);  
     list->tail->next = new_node;
@@ -164,18 +164,18 @@ int PopLinkedList(LinkedList list, void **data) {
   // previously allocated by InsertLinkedList().
 
   // empty list return 1
-  if (list->num_elements == 0) {
+  if (NumElementsInLinkedList(list) == 0) {
     return 1;
   }
   *data = list->head->payload;
   LinkedListNodePtr headnode = list->head;
   // If the list is non-empty, there are two cases to consider:
-  if (list->num_elements == 1) { 
+  if (NumElementsInLinkedList(list) == 1) { 
     // case(a): a list with a single element in it
     list->head = NULL;
     list->tail = NULL;
     free(list->head);
-  } else if (list->num_elements >= 2) {
+  } else if (NumElementsInLinkedList(list) >= 2) {
     // case(b): general case of a list with >=2 elements in it
     list->head = headnode->next;
     list->head->prev = NULL;
@@ -193,18 +193,18 @@ int SliceLinkedList(LinkedList list, void **data) {
   // Step 6: implement SliceLinkedList.
 
   // empty list return 1
-  if (list->num_elements == 0) {
+  if (NumElementsInLinkedList(list) == 0) {
     return 1;
   }
   *data = list->tail->payload;
   LinkedListNodePtr tailnode = list->tail;
   // If the list is non-empty, there are two cases to consider:
-  if (list->num_elements == 1) { 
+  if (NumElementsInLinkedList(list) == 1) { 
     // case(a): a list with a single element in it
     list->head = NULL;
     list->tail = NULL;
     free(list->tail);
-  } else if (list->num_elements >= 2) {
+  } else if (NumElementsInLinkedList(list) >= 2) {
     // case(b): general case of a list with >=2 elements in it
     list->tail = tailnode->prev;
     list->tail->next = NULL;
@@ -352,5 +352,36 @@ int LLIterDelete(LLIter iter, LLPayloadFreeFnPtr payload_free_function) {
   // the iterator is pointing to, and also free any LinkedList
   // data structure element as appropriate.
   
+  LinkedListNodePtr currentNode = iter->cur_node;
+  iter->list->num_elements--;
+  // degenerate case 1: the list becomes empty after deleting.
+  if (NumElementsInLinkedList(iter->list) == 0) {
+    iter->list->head = NULL;
+    iter->list->tail = NULL;
+    iter->cur_node = NULL;
+    payload_free_function(currentNode->payload);
+    free(currentNode);
+    return 1;
+  }
+  
+  // degenerate case 2: iter points at head
+  if (!LLIterHasPrev(iter)) {
+    iter->cur_node = iter->cur_node->next;
+    iter->list->head = iter->list->head->next;
+    iter->list->head->prev = NULL;
+  } else if (!LLIterHasNext(iter)) {
+    // degenerate case 3: iter points at tail
+    iter->cur_node = iter->cur_node->prev;
+    iter->list->tail = iter->list->tail->prev;
+    iter->list->tail->next = NULL;
+  } else {
+    // fully general case: iter points in the middle of a list
+    iter->cur_node->next->prev = iter->cur_node->prev;
+    iter->cur_node->prev->next = iter->cur_node->next;
+    iter->cur_node = iter->cur_node->next;
+  }
+  payload_free_function(currentNode->payload);
+  free(currentNode);
+  return 0;
   
 }
