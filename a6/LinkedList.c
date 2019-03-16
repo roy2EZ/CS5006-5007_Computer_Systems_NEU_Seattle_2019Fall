@@ -218,8 +218,8 @@ int SliceLinkedList(LinkedList list, void **data) {
 
 void SortLinkedList(LinkedList list, unsigned int ascending, LLPayloadComparatorFnPtr compare) {
     Assert007(list != NULL);
-    if (list->num_elements <2) {
-        return; 
+    if (list->num_elements < 2) {
+      return; 
     }
 
     int swapped; 
@@ -274,8 +274,13 @@ int LLIterNext(LLIter iter) {
   Assert007(iter != NULL);
 
   // Step 7: if there is another node beyond the iterator, advance to it,
-  // and return 0. If there isn't another node, return 1. 
+  // and return 0. If there isn't another node, return 1.
   
+  if(LLIterHasNext(iter)) {
+    iter->cur_node = iter->cur_node->next;
+    return 0;
+  }
+  return 1;
 }
 
 int LLIterGetPayload(LLIter iter, void** data) {
@@ -294,7 +299,11 @@ int LLIterPrev(LLIter iter) {
   Assert007(iter != NULL); 
   // Step 8:  if there is another node beyond the iterator, go to it,
   // and return 0. If not return 1. 
-
+  if(LLIterHasPrev(iter)) {
+    iter->cur_node = iter->cur_node->prev;
+    return 0;
+  }
+  return 1;
 }
 
 int DestroyLLIter(LLIter iter) {
