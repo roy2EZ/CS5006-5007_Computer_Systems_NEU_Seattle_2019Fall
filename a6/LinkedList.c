@@ -169,19 +169,19 @@ int PopLinkedList(LinkedList list, void **data) {
   }
   *data = list->head->payload;
   LinkedListNodePtr headnode = list->head;
-  //If the list is non-empty, there are two cases to consider:
+  // If the list is non-empty, there are two cases to consider:
   if (list->num_elements == 1) { 
     // case(a): a list with a single element in it
+    list->head = NULL;
     list->tail = NULL;
     free(list->head);
-    list->head = NULL;
   } else if (list->num_elements >= 2) {
     // case(b): general case of a list with >=2 elements in it
     list->head = headnode->next;
     list->head->prev = NULL;
-    free(headnode);
     headnode = NULL;
   }
+  free(headnode);
   list->num_elements--;
   return 0; 
 }
@@ -192,8 +192,28 @@ int SliceLinkedList(LinkedList list, void **data) {
 
   // Step 6: implement SliceLinkedList.
 
-    
-    return 0; 
+  // empty list return 1
+  if (list->num_elements == 0) {
+    return 1;
+  }
+  *data = list->tail->payload;
+  LinkedListNodePtr tailnode = list->tail;
+  // If the list is non-empty, there are two cases to consider:
+  if (list->num_elements == 1) { 
+    // case(a): a list with a single element in it
+    list->head = NULL;
+    list->tail = NULL;
+    free(list->tail);
+  } else if (list->num_elements >= 2) {
+    // case(b): general case of a list with >=2 elements in it
+    list->tail = tailnode->prev;
+    list->tail->next = NULL;
+    tailnode = NULL;
+  }
+  free(tailnode);
+  list->num_elements--;
+
+  return 0; 
 }
 
 void SortLinkedList(LinkedList list, unsigned int ascending, LLPayloadComparatorFnPtr compare) {
