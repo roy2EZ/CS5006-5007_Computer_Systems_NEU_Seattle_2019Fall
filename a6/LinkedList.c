@@ -14,7 +14,9 @@
 //  General Public License for more details.
 
 // homework from: Rongyi Chen
-// date:3/16/2019
+// date:3/17/2019
+// I had conversations about this assignment for help with my friend&roommate: 
+// Xiaocong Chen
 
 #include "LinkedList.h"
 #include "LinkedList_priv.h"
@@ -101,20 +103,20 @@ int InsertLinkedList(LinkedList list, void *data) {
     new_node->next = new_node->prev = NULL;
     list->num_elements = 1U;
     return 0;
-  } 
+  }
   
   // Step 3.
   // typical case; list has >=1 elements
   if (NumElementsInLinkedList(list) >= 1) {
-    Assert007(list->head != NULL);
-    Assert007(list->tail != NULL);
+    Assert007(list->head != NULL);  // debugging aid
+    Assert007(list->tail != NULL);  // debugging aid
     list->head->prev = new_node;
     new_node->prev = NULL;
     new_node->next = list->head;
     list->head = new_node;
     list->num_elements++;
     return 0;
-  } 
+  }
   return 0;
 }
 
@@ -168,20 +170,20 @@ int PopLinkedList(LinkedList list, void **data) {
     return 1;
   }
   *data = list->head->payload;
-  LinkedListNodePtr headnode = list->head;
   // If the list is non-empty, there are two cases to consider:
   if (NumElementsInLinkedList(list) == 1) { 
     // case(a): a list with a single element in it
-    list->head = NULL;
     list->tail = NULL;
     free(list->head);
+    list->head = NULL;
   } else if (NumElementsInLinkedList(list) >= 2) {
     // case(b): general case of a list with >=2 elements in it
+    LinkedListNodePtr headnode = list->head;
     list->head = headnode->next;
     list->head->prev = NULL;
+    free(headnode);
     headnode = NULL;
   }
-  free(headnode);
   list->num_elements--;
   return 0; 
 }
@@ -196,23 +198,21 @@ int SliceLinkedList(LinkedList list, void **data) {
   if (NumElementsInLinkedList(list) == 0) {
     return 1;
   }
-  *data = list->tail->payload;
-  LinkedListNodePtr tailnode = list->tail;
   // If the list is non-empty, there are two cases to consider:
   if (NumElementsInLinkedList(list) == 1) { 
     // case(a): a list with a single element in it
-    list->head = NULL;
-    list->tail = NULL;
-    free(list->tail);
+    *data = list->head->payload;
+    free(list->head);
+    list->head = list->tail = NULL;
   } else if (NumElementsInLinkedList(list) >= 2) {
     // case(b): general case of a list with >=2 elements in it
-    list->tail = tailnode->prev;
+    *data = list->tail->payload;
+    LinkedListNodePtr tempNode = list->tail->prev;
+    free(list->tail);
+    list->tail = tempNode;
     list->tail->next = NULL;
-    tailnode = NULL;
   }
-  free(tailnode);
   list->num_elements--;
-
   return 0; 
 }
 
