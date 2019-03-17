@@ -1,4 +1,4 @@
-all: hello example test
+all: info hello example test
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
