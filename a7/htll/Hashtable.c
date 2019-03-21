@@ -246,7 +246,7 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
     return 0;
   } else {
     // if find the key in the hash table
-    junkKVP = **bucketPtr;
+    junkKVP = *bucketPtr;
     free(*bucketPtr);
     LLIterDelete(iter, NullFree);
     ht->num_elements--;
@@ -387,7 +387,40 @@ void DestroyHashtableIterator(HTIter iter) {
 // Moves to the next element; does not return. 
 int HTIteratorNext(HTIter iter) {
   // Step 4: Implement HTIteratorNext
-  return 0;
+  
+  if (iter->ht->num_elements != 0 ||
+      iter->bucket_iter != NULL) {
+    // If there is next element in current chain
+    if (LLIterNext(iter->bucket_iter)) {
+      return 1;
+    } else {
+      // To find next chain for next element in HashTable
+      int chainNum = iter->ht->num_buckets + 1;
+      for (int i = iter->which_bucket + 1; i < iter->ht->num_buckets; i++) {
+        if (NumElementsInLinkedList(iter->ht->buckets[i]) > 0) {
+          chainNum = i;
+          iter->which_bucket = i;
+          break;
+        }
+      }
+      // If cannot find next non-empty chain in HashTable, return 0
+      if (chainNum >= iter->ht->num_buckets) {
+        return 0;
+      } else {
+        // If found next non-empty chain in HashTable
+        free(iter->bucket_iter);
+        iter->bucket_iter = CreateLLIter(iter->ht->buckets[chainNum]);
+        
+        if (iter->bucket_iter == NULL) {
+          DestroyHashtableIterator(iter);
+          return 0;
+        }
+        return 1;
+      }
+    }
+  } else {
+    return 0;
+  }
 }
 
 int HTIteratorGet(HTIter iter, HTKeyValuePtr dest) {
