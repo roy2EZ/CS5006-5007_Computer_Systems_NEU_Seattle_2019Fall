@@ -17,8 +17,8 @@ static void NullFree(void *freeme) { }
 static void FreeKVP(void *freeme) {
   free(freeme); 
 }
-
-static bool HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv);
+// a helper function in step 1, 2 and 3
+static int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv);
 
 Hashtable CreateHashtable(int num_buckets) {
   if (num_buckets == 0)
@@ -88,14 +88,14 @@ void DestroyHashtable(Hashtable ht, ValueFreeFnPtr valueFreeFunction) {
 // the helper funtion mentioned in STEP 1 comments
 // return 0 if key is not found in the chain
 // return 1 if key is found in the chain
-static bool HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv) {
+static int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv) {
   Assert007(iter != NULL);
-  while (true) {
+  while (1) {
     LLIterGetPayload(iter, (void **) kv);
 
     // If can find the key in the chain
     if ((*kv)->key == key)
-      return true;
+      return 1;
 
     // if cannot find the key in the chain
     if (LLIterHasNext(iter) == 0)
@@ -103,7 +103,7 @@ static bool HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv) {
     // go to the next node
     LLIterNext(iter);
   }
-  return false;
+  return 0;
 }
 
 int PutInHashtable(Hashtable ht,
@@ -161,7 +161,7 @@ int PutInHashtable(Hashtable ht,
       return 0;
     }
     old_key_value->key = old_payload->key;
-    old_key_valuef->value = old_payload->value;
+    old_key_value->value = old_payload->value;
     free(old_payload);
     LLIterDelete(iter, NullFree);
     DestroyLLIter(iter);
