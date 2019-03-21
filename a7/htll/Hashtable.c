@@ -105,32 +105,69 @@ int PutInHashtable(Hashtable ht,
   // all that logic inside here. You might also find that your helper(s)
   // can be reused in step 2 and 3.
   HTKeyValuePtr newPtr = (HTKeyValuePtr)malloc(sizeof(HTKeyValue));
+  // if momery error return 0
   if (newPrt == NULL) {
     return 0;
   }
+  // point to the key value pair
   *newPrt = kvp;
-  // use helper function
+  // use helper function to remove the key within the chain
   int result = HelperFunction(insert_chain, kvp.key, old_key_value, true);
+  // if failure return 0
   if (result == -1) {
     return 0;
   } else if (result == 1) {
+    // if remove success, decrease the elements number by 1 in the hash table
     ht->num_elements--;
   }
+  // if insert success, increase the elements number by 1 in the hash table
   if (InsertLinkedList(insert_chain, newPrt) == 0) {
     ht->num_elements++;
     return result + 1;
   } else {
+    //if insert fail, free the pointer and return 0
     free(newPrt);
+    return 0;
   }
 }
 
-// the helper funtion mentioned above in STEP 1
-int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, bool remove) {
+// the helper funtion mentioned above in STEP 1 to remove a key within a chain
+int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, bool isRemove) {
+  // if no elements in the list, return 0
   if (NumElementsInLinkedList(chain) == 0) {
     return 0;
   }
+  // create the linkedlist iterator
   LLIter iter = CreateLLIter(chain);
-  if (iter == NULL)
+  if (iter == NULL) {
+    // out of memory, return -1
+    return -1;
+  }
+  
+  do {
+    HTKeyValue *payloadPrt;
+    payloadPrt = NULL;
+    LLIterGetPayload(iter, (void *) &payloadPtr);
+
+    if (payloadPtr->key == key) {
+      *keyPtr = *payloadPtr;
+      
+      if(isRemove) {
+        free(payloadPtr);
+        LLIterDelete(iter, NullFree)
+      }
+
+      DestroyLLIter(iter);
+      iter = NULL;
+      return 1;
+    } else {
+      LLIterGetPayload(iter, (void **)keyPtr);
+    }
+  } while (LLIterNext(iter) == 0);
+  
+  DestroyLLIter(iter);
+  iter = NULL;
+  return 0;
 }
 
 int HashKeyToBucketNum(Hashtable ht, uint64_t key) {
