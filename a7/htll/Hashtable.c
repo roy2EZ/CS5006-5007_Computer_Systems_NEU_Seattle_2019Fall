@@ -152,7 +152,16 @@ int PutInHashtable(Hashtable ht,
  
 // the helper funtion mentioned above in STEP 1 to remove a key within a chain
 int HelperFunction(uint64_t key, LLIter *iter, LinkedList chain, HTKeyValue **bucketPtr) {
-
+  if (NumElementsInLinkedList(chain) == 0) {
+    return 0;
+  }
+  do {
+    LLIterGetPayload(*iter, (void **) bucketPtr);
+    if ((*bucketPtr)->key == key) {
+      return 1;
+    }
+  } while (LLIterNext(*iter) == 0);
+  return 0;
 }
 
 int HashKeyToBucketNum(Hashtable ht, uint64_t key) {
