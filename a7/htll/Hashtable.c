@@ -147,9 +147,7 @@ int PutInHashtable(Hashtable ht,
   }
   DestroyLLIter(iter);
   free(kv);
-  return 0;
-  
-  
+  return 0; 
 }
  
 // the helper funtion mentioned above in STEP 1 to remove a key within a chain
