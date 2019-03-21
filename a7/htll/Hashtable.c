@@ -130,7 +130,7 @@ int PutInHashtable(Hashtable ht,
 
   HTKeyValue *kv = (HTKeyValue*)malloc(sizeof(HTKeyValue));
   if (kv == NULL) {
-    return 0;
+    return 1;
   }
   kv->key = kvp.key;
   kv->value = kvp.value;
@@ -138,27 +138,27 @@ int PutInHashtable(Hashtable ht,
   if (NumElementsInLinkedList(insert_chain) == 0) {
     if (InsertLinkedList(insert_chain, (void *) kv) == 0) {
       ht->num_elements++;
-      return 1;
+      return 0;
     }
     free(kv);
-    return 0;
+    return 1;
   }
   // create an iterator of the bucket
   LLIter iter = CreateLLIter(insert_chain);
+  // no more memory, return 1
   if (iter == NULL) {
     free(kv);
-    return 0;
+    return 1;
   }
   HTKeyValue *old_payload;
   // use helper function as the comments mentioned in step 1
-  
   // if can find the key in the bucket
-  if (HelperFunction(iter, kvp.key, &old_payload)) {
-    // if cannot insert key value pair to the bucket, return 0
+  if (HelperFunction(iter, kvp.key, &old_payload) == 1) {
+    // if cannot insert key value pair to the bucket, return 1
     if (InsertLinkedList(insert_chain, (void *) kv) != 0) {
       free(kv);
       DestroyLLIter(iter);
-      return 0;
+      return 1;
     }
     old_key_value->key = old_payload->key;
     old_key_value->value = old_payload->value;
@@ -171,10 +171,10 @@ int PutInHashtable(Hashtable ht,
 
   if (InsertLinkedList(insert_chain, (void *) kv) != 0) {
     free(kv);
-    return 0; 
+    return 1; 
   }
   ht->num_elements++;  
-  return 1;
+  return 0;
 }
 
 int HashKeyToBucketNum(Hashtable ht, uint64_t key) {
@@ -191,9 +191,9 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   lookup_bucket = HashKeyToBucketNum(ht, key);
   lookup_chain = ht->buckets[lookup_bucket];
 
-  //if bucket empty, return 0
+  //if bucket empty, ken cannot be found, return -1
   if (NumElementsInLinkedList(lookup_chain) == 0) {
-    return 0;
+    return -1;
   }
   // create iterator for the chain
   LLIter iter = CreateLLIter(lookup_chain);
@@ -204,15 +204,16 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   HTKeyValue *payload;
   // use helper function again 
   // if can find the key in bucket, copy the kv pair to the returning payload
-  if (HelperFunction(iter, key, &payload)) {
+  if (HelperFunction(iter, key, &payload) == 1) {
     result->key = payload->key;
     result->value = payload->value;
     DestroyLLIter(iter);
-    return 1;
-  } else {
-    // if cannot find the key, free the iterator and return 0
-    DestroyLLIter(iter);
+    // return 0 for successfully find
     return 0;
+  } else {
+    // if cannot find the key, free the iterator and return -1
+    DestroyLLIter(iter);
+    return -1;
   }
 
 }
@@ -234,9 +235,9 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
   remove_bucket = HashKeyToBucketNum(ht, key);
   remove_chain = ht->buckets[remove_bucket];
 
-  //if no elements in bucket, return 0
+  //if no elements in bucket, return -1
   if (NumElementsInLinkedList(remove_chain) == 0) {
-    return 0;
+    return -1;
   }
   // create iterator for the bucket
   LLIter iter = CreateLLIter(remove_chain);
@@ -246,18 +247,18 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
   HTKeyValue* payload; 
   // use helper function again
   // if can find the key
-  if (HelperFunction(iter, key, &payload)) {
+  if (HelperFunction(iter, key, &payload) == 1) {
     junkKVP->key = payload->key;
     junkKVP->value = payload->value;
     free(payload);
     LLIterDelete(iter, NullFree);
     DestroyLLIter(iter);
     ht->num_elements--;
-    return 1;
+    return 0;
   } else {
     // if cannot find the key
     DestroyLLIter(iter);
-    return 0;
+    return -1;
   }
 }
 
