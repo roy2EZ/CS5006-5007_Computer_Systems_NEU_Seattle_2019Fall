@@ -17,8 +17,6 @@ static void NullFree(void *freeme) { }
 static void FreeKVP(void *freeme) {
   free(freeme); 
 }
-// a helper function in step 1, 2 and 3
-static int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv);
 
 Hashtable CreateHashtable(int num_buckets) {
   if (num_buckets == 0)
@@ -88,21 +86,24 @@ void DestroyHashtable(Hashtable ht, ValueFreeFnPtr valueFreeFunction) {
 // the helper funtion mentioned in STEP 1 comments
 // return 0 if key is not found in the chain
 // return 1 if key is found in the chain
-static int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv) {
+int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv) {
   Assert007(iter != NULL);
   while (1) {
     LLIterGetPayload(iter, (void **) kv);
 
-    // If can find the key in the chain
+    // key is found
     if ((*kv)->key == key)
       return 1;
 
-    // if cannot find the key in the chain
+    // out of while loop for iterate to the end of the list
     if (LLIterHasNext(iter) == 0)
       break;
+
     // go to the next node
     LLIterNext(iter);
   }
+
+  // key is not found return 0
   return 0;
 }
 
@@ -128,7 +129,7 @@ int PutInHashtable(Hashtable ht,
   // all that logic inside here. You might also find that your helper(s)
   // can be reused in step 2 and 3.
 
-  HTKeyValue *kv = (HTKeyValue*)malloc(sizeof(HTKeyValue));
+  HTKeyValue *kv = (HTKeyValue *)malloc(sizeof(HTKeyValue));
   if (kv == NULL) {
     return 1;
   }
@@ -136,14 +137,17 @@ int PutInHashtable(Hashtable ht,
   kv->value = kvp.value;
   // if chain has 0 elements, insert the key value pair into the hash table
   if (NumElementsInLinkedList(insert_chain) == 0) {
-    if (InsertLinkedList(insert_chain, (void *) kv) == 0) {
-      ht->num_elements++;
-      return 0;
+    // if insert fail, return 1
+    if (InsertLinkedList(insert_chain, (void *) kv) != 0) {
+      free(kv);
+      return 1;
     }
-    free(kv);
-    return 1;
+    // if insert successfully, return 0
+    ht->num_elements++;
+    return 0;
   }
-  // create an iterator of the bucket
+  // if the chain is not empty
+  // create an iterator for the chain
   LLIter iter = CreateLLIter(insert_chain);
   // no more memory, return 1
   if (iter == NULL) {
@@ -154,12 +158,13 @@ int PutInHashtable(Hashtable ht,
   // use helper function as the comments mentioned in step 1
   // if can find the key in the bucket
   if (HelperFunction(iter, kvp.key, &old_payload) == 1) {
-    // if cannot insert key value pair to the bucket, return 1
+    // insert key value pair to the bucket, if fail return 1
     if (InsertLinkedList(insert_chain, (void *) kv) != 0) {
       free(kv);
       DestroyLLIter(iter);
       return 1;
     }
+    // put key and value to the returning key value pair
     old_key_value->key = old_payload->key;
     old_key_value->value = old_payload->value;
     free(old_payload);
@@ -191,7 +196,7 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   lookup_bucket = HashKeyToBucketNum(ht, key);
   lookup_chain = ht->buckets[lookup_bucket];
 
-  //if bucket empty, ken cannot be found, return -1
+  //if bucket empty, key cannot be found, return -1
   if (NumElementsInLinkedList(lookup_chain) == 0) {
     return -1;
   }
@@ -210,12 +215,10 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
     DestroyLLIter(iter);
     // return 0 for successfully find
     return 0;
-  } else {
-    // if cannot find the key, free the iterator and return -1
-    DestroyLLIter(iter);
-    return -1;
   }
-
+  // if cannot find the key, free the iterator and return -1
+  DestroyLLIter(iter);
+  return -1;
 }
 
 
@@ -228,7 +231,8 @@ int NumElemsInHashtable(Hashtable ht) {
 }
 
 
-int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
+int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValue *junkKVP) {
+  Assert007(ht != NULL);
   // STEP 3: Implement Remove
   int remove_bucket;
   LinkedList remove_chain;
@@ -255,11 +259,10 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
     DestroyLLIter(iter);
     ht->num_elements--;
     return 0;
-  } else {
-    // if cannot find the key
-    DestroyLLIter(iter);
-    return -1;
-  }
+  } 
+  // if cannot find the key
+  DestroyLLIter(iter);
+  return -1;
 }
 
 
