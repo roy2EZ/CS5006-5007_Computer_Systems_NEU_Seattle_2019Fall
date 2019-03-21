@@ -119,7 +119,7 @@ int PutInHashtable(Hashtable ht,
   // if chain has 0 elements, insert the key value pari into the hash table
   if (NumElementsInLinkedList(insert_chain) == 0) {
     // if seccessfull to insert
-    if (InsertLinkedList(insert_chain, (void) kv) == 0) {
+    if (InsertLinkedList(insert_chain, (void *) kv) == 0) {
       ht->num_elements++;
       return 1;
     }
@@ -132,6 +132,22 @@ int PutInHashtable(Hashtable ht,
     return 0;
   }
   int isFound = HelperFunction(kvp.key, &iter, insert_chain, bucketPtr);
+  // if cannot find the element with the key in chain
+  // insert the key value pari into hash table
+  if (isFound == 0 && InsertLinkedList(insert_chain, (void *) kv) == 0) {
+    ht->num_elements++;
+    DestroyLLIter(iter);
+    return 1;
+  } else if (isFound == 1 && InsertLinkedList(insert_chain, (void *) kv) == 0) {
+    *old_key_value = **bucketPtr;
+    LLIterDelete(iter, NullFree);
+    DestroyLLIter(iter);
+    free(*bucketPtr);
+    return 2;
+  }
+  DestroyLLIter(iter);
+  free(kv);
+  return 0;
   
   
 }
