@@ -185,7 +185,7 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   if (insert_chain == NULL) {
     return -1;
   }
-  //if no elements in bucket, return 0
+  //if no elements in chain, return 0
   if (NumElementsInLinkedList(insert_chain) == 0) {
     return 0;
   }
@@ -222,8 +222,37 @@ int NumElemsInHashtable(Hashtable ht) {
 
 int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
   // STEP 3: Implement Remove
-  return 0;
-  
+  int insert_bucket;
+  LinkedList insert_chain;
+  insert_bucket = HashKeyToBucketNum(ht, key);
+  insert_chain = ht->buckets[insert_bucket];
+
+  HTKeyValuePtr bucket;
+  HTKeyValuePtr *bucketPtr = &bucket;
+  //if no elements in chain, return 0
+  if (NumElementsInLinkedList(insert_chain) == 0) {
+    return 0;
+  }
+  // create iterator for the chain
+  LLIter iter = CreateLLIter(insert_chain);
+  if (iter == NULL) {
+    return -1;
+  }
+  // use helper function again
+  int isFound = HelperFunction(key, &iter, insert_chain, bucketPtr);
+  // if cannot find the key in hash table
+  if (isFound == 0) {
+    DestroyLLIter(iter);
+    return 0;
+  } else {
+    // if find the key in the hash table
+    junkKVP = **bucketPtr;
+    free(*bucketPtr);
+    LLIterDelete(iter, NullFree);
+    ht->num_elements--;
+    DestroyLLIter(iter);
+    return 1;
+  }
 }
 
 
