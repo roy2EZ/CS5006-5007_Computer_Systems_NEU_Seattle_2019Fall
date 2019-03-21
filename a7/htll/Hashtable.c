@@ -8,6 +8,9 @@
 #include "LinkedList.h"
 #include "Assert007.h"
 
+//Homework submitter: Rongyi Chen
+//Date: 3/21/2019
+
 // a free function that does nothing
 static void NullFree(void *freeme) { }
 
