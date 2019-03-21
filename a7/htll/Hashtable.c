@@ -173,9 +173,7 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   Assert007(ht != NULL);
   
   // STEP 2: Implement lookup
-
-
-
+  return 0;
   
 }
 
