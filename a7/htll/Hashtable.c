@@ -17,6 +17,8 @@ static void NullFree(void *freeme) { }
 static void FreeKVP(void *freeme) {
   free(freeme); 
 }
+// helper function in step 1
+int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, int isRemove);
 
 Hashtable CreateHashtable(int num_buckets) {
   if (num_buckets == 0)
@@ -106,13 +108,13 @@ int PutInHashtable(Hashtable ht,
   // can be reused in step 2 and 3.
   HTKeyValuePtr newPtr = (HTKeyValuePtr)malloc(sizeof(HTKeyValue));
   // if momery error return 0
-  if (newPrt == NULL) {
+  if (newPtr == NULL) {
     return 0;
   }
   // point to the key value pair
-  *newPrt = kvp;
+  *newPtr = kvp;
   // use helper function to remove the key within the chain
-  int result = HelperFunction(insert_chain, kvp.key, old_key_value, true);
+  int result = HelperFunction(insert_chain, kvp.key, old_key_value, 1);
   // if failure return 0
   if (result == -1) {
     return 0;
@@ -121,18 +123,18 @@ int PutInHashtable(Hashtable ht,
     ht->num_elements--;
   }
   // if insert success, increase the elements number by 1 in the hash table
-  if (InsertLinkedList(insert_chain, newPrt) == 0) {
+  if (InsertLinkedList(insert_chain, newPtr) == 0) {
     ht->num_elements++;
     return result + 1;
   } else {
     //if insert fail, free the pointer and return 0
-    free(newPrt);
+    free(newPtr);
     return 0;
   }
 }
 
 // the helper funtion mentioned above in STEP 1 to remove a key within a chain
-int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, bool isRemove) {
+int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, int isRemove) {
   // if no elements in the list, return 0
   if (NumElementsInLinkedList(chain) == 0) {
     return 0;
@@ -145,16 +147,16 @@ int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, bool isRe
   }
   
   do {
-    HTKeyValue *payloadPrt;
-    payloadPrt = NULL;
+    HTKeyValue *payloadPtr;
+    payloadPtr = NULL;
     LLIterGetPayload(iter, (void *) &payloadPtr);
 
     if (payloadPtr->key == key) {
       *keyPtr = *payloadPtr;
       
-      if(isRemove) {
+      if(isRemove != 0) {
         free(payloadPtr);
-        LLIterDelete(iter, NullFree)
+        LLIterDelete(iter, NullFree);
       }
 
       DestroyLLIter(iter);
@@ -179,7 +181,7 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   Assert007(ht != NULL);
   
   // STEP 2: Implement lookup
-  
+  return 0;
 }
 
 
@@ -194,7 +196,7 @@ int NumElemsInHashtable(Hashtable ht) {
 
 int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
   // STEP 3: Implement Remove
-
+  return 0;
   
 }
 
@@ -330,13 +332,13 @@ void DestroyHashtableIterator(HTIter iter) {
 // Moves to the next element; does not return. 
 int HTIteratorNext(HTIter iter) {
   // Step 4: Implement HTIteratorNext
-  
+  return 0;
 }
 
 int HTIteratorGet(HTIter iter, HTKeyValuePtr dest) {
   Assert007(iter != NULL); 
   // Step 6 -- implement HTIteratorGet.
-  
+  return 0;
 }
 
 //  0 if there are no more elements.
