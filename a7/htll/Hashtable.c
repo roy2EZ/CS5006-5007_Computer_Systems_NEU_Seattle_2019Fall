@@ -35,7 +35,7 @@ Hashtable CreateHashtable(int num_buckets) {
     return NULL;
   }
 
-  for (int i=  0; i < num_buckets; i++) {
+  for (int i = 0; i < num_buckets; i++) {
     ht->buckets[i] = CreateLinkedList();
     if (ht->buckets[i] == NULL) {
       // Need to free everything and then return NULL
@@ -101,7 +101,33 @@ int PutInHashtable(Hashtable ht,
   // and optionally remove a key within a chain, rather than putting
   // all that logic inside here. You might also find that your helper(s)
   // can be reused in step 2 and 3.
+  HTKeyValuePtr newPtr = (HTKeyValuePtr)malloc(sizeof(HTKeyValue));
+  if (newPrt == NULL) {
+    return 0;
+  }
+  *newPrt = kvp;
+  // use helper function
+  int result = HelperFunction(insert_chain, kvp.key, old_key_value, true);
+  if (result == -1) {
+    return 0;
+  } else if (result == 1) {
+    ht->num_elements--;
+  }
+  if (InsertLinkedList(insert_chain, newPrt) == 0) {
+    ht->num_elements++;
+    return result + 1;
+  } else {
+    free(newPrt);
+  }
+}
 
+// the helper funtion mentioned above in STEP 1
+int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, bool remove) {
+  if (NumElementsInLinkedList(chain) == 0) {
+    return 0;
+  }
+  LLIter iter = CreateLLIter(chain);
+  if (iter == NULL)
 }
 
 int HashKeyToBucketNum(Hashtable ht, uint64_t key) {
