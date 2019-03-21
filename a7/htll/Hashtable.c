@@ -17,8 +17,8 @@ static void NullFree(void *freeme) { }
 static void FreeKVP(void *freeme) {
   free(freeme); 
 }
-// helper function in step 1
-int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, int isRemove);
+// helper function in step 1, 2 and 3
+int HelperFunction(uint64_t key, LLIter *iter, LinkedList chain, HTKeyValue **bucketPtr);
 
 Hashtable CreateHashtable(int num_buckets) {
   if (num_buckets == 0)
@@ -106,70 +106,39 @@ int PutInHashtable(Hashtable ht,
   // and optionally remove a key within a chain, rather than putting
   // all that logic inside here. You might also find that your helper(s)
   // can be reused in step 2 and 3.
-  HTKeyValuePtr newPtr = (HTKeyValuePtr)malloc(sizeof(HTKeyValue));
+
+  HTKeyValue *kv = (HTKeyValue*)malloc(sizeof(HTKeyValue));
   // if momery error return 0
-  if (newPtr == NULL) {
+  if (kv == NULL) {
     return 0;
   }
+  HTKeyValuePtr bucket;
+  HTKeyValuePtr *bucketPtr = &bucket;
   // point to the key value pair
-  *newPtr = kvp;
-  // use helper function to remove the key within the chain
-  int result = HelperFunction(insert_chain, kvp.key, old_key_value, 1);
-  // if failure return 0
-  if (result == -1) {
-    return 0;
-  } else if (result == 1) {
-    // if remove success, decrease the elements number by 1 in the hash table
-    ht->num_elements--;
-  }
-  // if insert success, increase the elements number by 1 in the hash table
-  if (InsertLinkedList(insert_chain, newPtr) == 0) {
-    ht->num_elements++;
-    return result + 1;
-  } else {
-    //if insert fail, free the pointer and return 0
-    free(newPtr);
-    return 0;
-  }
-}
-
-// the helper funtion mentioned above in STEP 1 to remove a key within a chain
-int HelperFunction(LinkedList chain, uint64_t key, HTKeyValue *keyPtr, int isRemove) {
-  // if no elements in the list, return 0
-  if (NumElementsInLinkedList(chain) == 0) {
-    return 0;
-  }
-  // create the linkedlist iterator
-  LLIter iter = CreateLLIter(chain);
-  if (iter == NULL) {
-    // out of memory, return -1
-    return -1;
-  }
-  
-  do {
-    HTKeyValue *payloadPtr;
-    payloadPtr = NULL;
-    LLIterGetPayload(iter, (void *) &payloadPtr);
-
-    if (payloadPtr->key == key) {
-      *keyPtr = *payloadPtr;
-      
-      if(isRemove != 0) {
-        free(payloadPtr);
-        LLIterDelete(iter, NullFree);
-      }
-
-      DestroyLLIter(iter);
-      iter = NULL;
+  *kv = kvp;
+  // if chain has 0 elements, insert the key value pari into the hash table
+  if (NumElementsInLinkedList(insert_chain) == 0) {
+    // if seccessfull to insert
+    if (InsertLinkedList(insert_chain, (void) kv) == 0) {
+      ht->num_elements++;
       return 1;
-    } else {
-      LLIterGetPayload(iter, (void **)keyPtr);
     }
-  } while (LLIterNext(iter) == 0);
+    free(kv);
+    return 0;
+  }
+  LLIter iter = CreateLLIter(insert_chain);
+  if (iter == NULL) {
+    free(kv);
+    return 0;
+  }
+  int isFound = HelperFunction(kvp.key, &iter, insert_chain, bucketPtr);
   
-  DestroyLLIter(iter);
-  iter = NULL;
-  return 0;
+  
+}
+ 
+// the helper funtion mentioned above in STEP 1 to remove a key within a chain
+int HelperFunction(uint64_t key, LLIter *iter, LinkedList chain, HTKeyValue **bucketPtr) {
+
 }
 
 int HashKeyToBucketNum(Hashtable ht, uint64_t key) {
@@ -181,7 +150,10 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   Assert007(ht != NULL);
   
   // STEP 2: Implement lookup
-  return 0;
+
+
+
+  
 }
 
 
