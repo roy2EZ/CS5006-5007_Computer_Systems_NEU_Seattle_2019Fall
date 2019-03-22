@@ -18,7 +18,7 @@ static void FreeKVP(void *freeme) {
   free(freeme); 
 }
 // a helper function in step 1, 2 and 3
-static int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv);
+static int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv);
 
 Hashtable CreateHashtable(int num_buckets) {
   if (num_buckets == 0)
@@ -88,21 +88,19 @@ void DestroyHashtable(Hashtable ht, ValueFreeFnPtr valueFreeFunction) {
 // the helper funtion mentioned in STEP 1 comments
 // return 0 if key is not found in the chain
 // return 1 if key is found in the chain
-static int HelperFunction(LLIter iter, uint64_t key, HTKeyValue **kv) {
+static int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv) {
   Assert007(iter != NULL);
-  while (1) {
-    LLIterGetPayload(iter, (void **) kv);
-
-    // If can find the key in the chain
-    if ((*kv)->key == key)
-      return 1;
-
-    // if cannot find the key in the chain
-    if (LLIterHasNext(iter) == 0)
-      break;
-    // go to the next node
-    LLIterNext(iter);
+  if (NumElementsInLinkedList(chain) == 0) {
+    return 0;
   }
+  do {
+    LLIterGetPayload(iter, (void **) kv);
+    // If can find the key in the chain
+    if ((*kv)->key == key) {
+      return 1;
+    }
+  } while (LLIterNext(iter) == 0);
+
   return 0;
 }
 
@@ -152,12 +150,12 @@ int PutInHashtable(Hashtable ht,
   HTKeyValue *old_payload;
   // use helper function as the comments mentioned in step 1
   // if can find the key in the bucket
-  int isFound = HelperFunction(iter, kvp.key, &old_payload);
+  int isFound = HelperFunction(kvp.key, iter, insert_chain, &old_payload);
   if (isFound == 0 && InsertLinkedList(insert_chain, (void *)kv) == 0) {
     ht->num_elements++;
     DestroyLLIter(iter);
     return 0;
-  } else if (isFound == 1 && InsertLinkedList(insert_chain, (void *)kv == 0) {
+  } else if (isFound == 1 && InsertLinkedList(insert_chain, (void *)kv) == 0) {
     old_key_value->key = old_payload->key;
     old_key_value->value = old_payload->value;
     free(old_payload);
@@ -195,7 +193,7 @@ int LookupInHashtable(Hashtable ht, uint64_t key, HTKeyValue *result) {
   HTKeyValue *payload;
   // use helper function again 
   // if can find the key in bucket, copy the kv pair to the returning payload
-  int isFound = HelperFunction(iter, key, &payload);
+  int isFound = HelperFunction(key, iter, lookup_chain, &payload);
   if (isFound == 1) {
     result->key = payload->key;
     result->value = payload->value;
@@ -235,7 +233,7 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValue *junkKVP) {
   }
   HTKeyValue* payload; 
   // use helper function again
-  int isFound = HelperFunction(iter, key, &payload);
+  int isFound = HelperFunction(key, iter, remove_chain, &payload);
   // if cannot find the key
   if (isFound == 0) {
 
