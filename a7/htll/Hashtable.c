@@ -9,7 +9,7 @@
 #include "Assert007.h"
 
 //Homework submitter: Rongyi Chen
-//Date: 3/21/2019
+//Date: 3/23/2019
 
 // a free function that does nothing
 static void NullFree(void *freeme) { }
@@ -17,6 +17,7 @@ static void NullFree(void *freeme) { }
 static void FreeKVP(void *freeme) {
   free(freeme); 
 }
+
 // a helper function in step 1, 2 and 3
 static int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv);
 
@@ -40,7 +41,7 @@ Hashtable CreateHashtable(int num_buckets) {
     return NULL;
   }
 
-  for (int i = 0; i < num_buckets; i++) {
+  for (int i=  0; i < num_buckets; i++) {
     ht->buckets[i] = CreateLinkedList();
     if (ht->buckets[i] == NULL) {
       // Need to free everything and then return NULL
@@ -104,6 +105,7 @@ static int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValu
   return 0;
 }
 
+
 int PutInHashtable(Hashtable ht,
                    HTKeyValue kvp,
                    HTKeyValue *old_key_value) {
@@ -130,8 +132,9 @@ int PutInHashtable(Hashtable ht,
   if (kv == NULL) {
     return 1;
   }
-  kv->key = kvp.key;
-  kv->value = kvp.value;
+  HTKeyValuePtr bucket;
+  HTKeyValuePtr *bucketPtr = &bucket;
+  *kv = kvp;
   // if chain has 0 elements, insert the key value pair into the hash table
   if (NumElementsInLinkedList(insert_chain) == 0) {
     if (InsertLinkedList(insert_chain, (void *) kv) == 0) {
@@ -147,24 +150,26 @@ int PutInHashtable(Hashtable ht,
     free(kv);
     return 1;
   }
-  HTKeyValue *old_payload;
+
   // use helper function as the comments mentioned in step 1
   // if can find the key in the bucket
-  int isFound = HelperFunction(kvp.key, iter, insert_chain, &old_payload);
-  if (isFound == 0 && InsertLinkedList(insert_chain, (void *)kv) == 0) {
-    ht->num_elements++;
-    DestroyLLIter(iter);
-    return 0;
-  } else if (isFound == 1 && InsertLinkedList(insert_chain, (void *)kv) == 0) {
-    old_key_value->key = old_payload->key;
-    old_key_value->value = old_payload->value;
-    free(old_payload);
-    LLIterDelete(iter, NullFree);
-    DestroyLLIter(iter);
-    return 2;
+  int isFound = HelperFunction(kvp.key, iter, insert_chain, bucketPtr);
+  if (AppendLinkedList(insert_chain, (void *)kv) == 0) {
+    if (isFound == 0) {
+      ht->num_elements += 1;
+      DestroyLLIter(iter);
+      return 0;
+    } else if (isFound == 1) {
+      *old_key_value = **bucketPtr;
+      free(*bucketPtr);
+      LLIterDelete(iter, &NullFree);
+      DestroyLLIter(iter);
+      return 2;
+    }
   }
+  DestroyLLIter(iter);
   free(kv);
-  return 1; 
+  return 1;
 }
 
 int HashKeyToBucketNum(Hashtable ht, uint64_t key) {
@@ -215,14 +220,14 @@ int NumElemsInHashtable(Hashtable ht) {
 }
 
 
-int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValue *junkKVP) {
+int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
   // STEP 3: Implement Remove
   int remove_bucket;
   LinkedList remove_chain;
   remove_bucket = HashKeyToBucketNum(ht, key);
   remove_chain = ht->buckets[remove_bucket];
 
-  //if no elements in bucket, return 0
+  //if no elements in bucket, return 
   if (NumElementsInLinkedList(remove_chain) == 0) {
     return -1;
   }
@@ -236,15 +241,14 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValue *junkKVP) {
   int isFound = HelperFunction(key, iter, remove_chain, &payload);
   // if cannot find the key
   if (isFound == 0) {
-
     DestroyLLIter(iter);
     return -1;
-  }
+  } 
   junkKVP->key = payload->key;
   junkKVP->value = payload->value;
-  free(payload);
-  LLIterDelete(iter, NullFree);
   ht->num_elements--;
+  free(payload);
+  LLIterDelete(iter, &NullFree);
   DestroyLLIter(iter);
   return 0;
 }
@@ -365,6 +369,9 @@ HTIter CreateHashtableIterator(Hashtable table) {
   }
   iter->ht = table;
   iter->which_bucket = 0;
+  while (NumElementsInLinkedList(iter->ht->buckets[iter->which_bucket]) == 0) {
+    iter->which_bucket++; 
+  }
   iter->bucket_iter = CreateLLIter(iter->ht->buckets[iter->which_bucket]);
 
   return iter;
@@ -381,49 +388,39 @@ void DestroyHashtableIterator(HTIter iter) {
 // Moves to the next element; does not return. 
 int HTIteratorNext(HTIter iter) {
   // Step 4: Implement HTIteratorNext
-  
-  if (iter->ht->num_elements != 0 || iter->bucket_iter != NULL) {
-    // If there is next element in current chain
-    if (LLIterNext(iter->bucket_iter)) {
-      return 0;
-    } else {
-      // To find next chain for next element in HashTable
-      int chain_num = iter->ht->num_buckets + 1;
-      for (int i = iter->which_bucket + 1; i < iter->ht->num_buckets; i++) {
-        if (NumElementsInLinkedList(iter->ht->buckets[i]) > 0) {
-          chain_num = i;
-          iter->which_bucket = i;
-          break;
-        }
-      }
-      // If cannot find next non-empty chain in HashTable, return 0
-      if (chain_num >= iter->ht->num_buckets) {
-        return 1;
-      } else {
-        // If found next non-empty chain in HashTable
-        free(iter->bucket_iter);
-        iter->bucket_iter = CreateLLIter(iter->ht->buckets[chain_num]);
-        
-        if (iter->bucket_iter == NULL) {
-          DestroyHashtableIterator(iter);
-          return 1;
-        }
-        return 0;
-      }
+  // if the bucket has next element, step to the next
+  if (LLIterHasNext(iter->bucket_iter) == 1) {
+    LLIterNext(iter->bucket_iter);
+    return 0;
+  }
+
+  // if the bucket is last one
+  if (iter->which_bucket == (iter->ht->num_buckets - 1)) {
+    return 1;
+  }
+
+  int i;
+  for ( i = iter->which_bucket + 1; i < iter->ht->num_buckets; i++) {
+    if (NumElementsInLinkedList(iter->ht->buckets[i]) > 0) {
+      iter->which_bucket = i;
+      break;
     }
-  } 
-  return 1;
+  }
   
+  if (i == iter->ht->num_buckets) { 
+    return 1; 
+  }
+  return 0;
 }
 
 int HTIteratorGet(HTIter iter, HTKeyValuePtr dest) {
   Assert007(iter != NULL); 
   // Step 6 -- implement HTIteratorGet.
-  if (iter->ht->num_elements != 0) {
-    HTKeyValuePtr kv;
-    HTKeyValuePtr *kvPtr = &kv;
-    LLIterGetPayload(iter->bucket_iter, (void **)kvPtr);
-    dest = **kvPtr;
+  if (iter->ht->num_elements != 0 && iter->bucket_iter != NULL) {
+    HTKeyValue *payload;
+    LLIterGetPayload(iter->bucket_iter, (void **) &payload);
+    dest->key = payload->key;
+    dest->value = payload->value;
     return 0;
   }
   return 1;
@@ -434,13 +431,20 @@ int HTIteratorHasMore(HTIter iter) {
   if (iter->bucket_iter == NULL) {
     return 0;
   }
-
+  
   if (LLIterHasNext(iter->bucket_iter) == 1)
     return 1;
-
+  
   // No more in this iter; are there more buckets?
-  if (iter->which_bucket < (iter->ht->num_buckets -1) )
-    return 1;
-  else return 0; 
+  int i = iter->which_bucket + 1;
+  while (i < (iter->ht->num_buckets)) {
+    // Make sure one of them has elements in it
+    if ((iter->ht->buckets[i] != NULL) &&
+        (NumElementsInLinkedList(iter->ht->buckets[i]) > 0)) {
+      return 1; 
+    }
+    i++;
+  }
+  
+  return 0;  
 }
-
