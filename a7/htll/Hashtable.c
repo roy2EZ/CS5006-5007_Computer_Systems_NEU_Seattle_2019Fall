@@ -86,7 +86,7 @@ void DestroyHashtable(Hashtable ht, ValueFreeFnPtr valueFreeFunction) {
 // the helper funtion mentioned in STEP 1 comments
 // return 0 if key is not found in the chain
 // return 1 if key is found in the chain
-static int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv) {
+int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv) {
   Assert007(iter != NULL);
   if (NumElementsInLinkedList(chain) == 0) {
     return 0;
