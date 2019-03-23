@@ -18,9 +18,6 @@ static void FreeKVP(void *freeme) {
   free(freeme); 
 }
 
-// a helper function in step 1, 2 and 3
-static int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv);
-
 Hashtable CreateHashtable(int num_buckets) {
   if (num_buckets == 0)
     return NULL;
@@ -41,7 +38,7 @@ Hashtable CreateHashtable(int num_buckets) {
     return NULL;
   }
 
-  for (int i=  0; i < num_buckets; i++) {
+  for (int i = 0; i < num_buckets; i++) {
     ht->buckets[i] = CreateLinkedList();
     if (ht->buckets[i] == NULL) {
       // Need to free everything and then return NULL
