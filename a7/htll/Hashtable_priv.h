@@ -27,7 +27,7 @@ int HashKeyToBucketNum(Hashtable ht, uint64_t key);
 //int BucketHasKey(LLIter iter, uint64_t key, HTKeyValue **keyvalue);
 
 // a helper function in step 1, 2 and 3
-int HelperFunction(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv);
+int BucketHasKey(uint64_t key, LLIter iter, LinkedList chain, HTKeyValue **kv);
 
 double GetAlpha(Hashtable *hashtable);
 
