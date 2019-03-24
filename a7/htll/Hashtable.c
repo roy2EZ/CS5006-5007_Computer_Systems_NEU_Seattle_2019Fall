@@ -149,7 +149,7 @@ int PutInHashtable(Hashtable ht,
   }
 
   // use helper function as the comments mentioned in step 1
-  // if can find the key in the bucket
+
   int isFound = HelperFunction(kvp.key, iter, insert_chain, bucketPtr);
   if (AppendLinkedList(insert_chain, (void *)kv) == 0) {
     if (isFound == 0) {
@@ -350,7 +350,6 @@ void ResizeHashtable(Hashtable ht) {
   return;
 }
 
-
 // ==========================
 // Hashtable Iterator
 // ==========================
@@ -393,6 +392,7 @@ int HTIteratorNext(HTIter iter) {
 
   // if the bucket is last one
   if (iter->which_bucket == (iter->ht->num_buckets - 1)) {
+    iter->bucket_iter = NULL;
     return 1;
   }
 
@@ -400,6 +400,7 @@ int HTIteratorNext(HTIter iter) {
   for ( i = iter->which_bucket + 1; i < iter->ht->num_buckets; i++) {
     if (NumElementsInLinkedList(iter->ht->buckets[i]) > 0) {
       iter->which_bucket = i;
+      iter->bucket_iter = CreateLLIter(iter->ht->buckets[i]);
       break;
     }
   }
