@@ -127,6 +127,7 @@ int PutInHashtable(Hashtable ht,
 
   HTKeyValue *kv = (HTKeyValue*)malloc(sizeof(HTKeyValue));
   if (kv == NULL) {
+    free(kv);
     return 1;
   }
   HTKeyValuePtr bucket;
@@ -145,6 +146,7 @@ int PutInHashtable(Hashtable ht,
   LLIter iter = CreateLLIter(insert_chain);
   if (iter == NULL) {
     free(kv);
+    DestroyLLIter(iter);
     return 1;
   }
 
@@ -158,9 +160,9 @@ int PutInHashtable(Hashtable ht,
       return 0;
     } else if (isFound == 1) {
       *old_key_value = **bucketPtr;
-      free(*bucketPtr);
       LLIterDelete(iter, &NullFree);
-      DestroyLLIter(iter);
+      DestroyLLIter(iter);   
+      free(*bucketPtr);
       return 2;
     }
   }
@@ -249,7 +251,6 @@ int RemoveFromHashtable(Hashtable ht, uint64_t key, HTKeyValuePtr junkKVP) {
   DestroyLLIter(iter);
   return 0;
 }
-
 
 uint64_t FNVHash64(unsigned char *buffer, unsigned int len) {
   // This code is adapted from code by Landon Curt Noll
@@ -392,6 +393,7 @@ int HTIteratorNext(HTIter iter) {
 
   // if the bucket is last one
   if (iter->which_bucket == (iter->ht->num_buckets - 1)) {
+    free(iter->bucket_iter);
     iter->bucket_iter = NULL;
     return 1;
   }
@@ -400,12 +402,13 @@ int HTIteratorNext(HTIter iter) {
   for ( i = iter->which_bucket + 1; i < iter->ht->num_buckets; i++) {
     if (NumElementsInLinkedList(iter->ht->buckets[i]) > 0) {
       iter->which_bucket = i;
+      free(iter->bucket_iter);
       iter->bucket_iter = CreateLLIter(iter->ht->buckets[i]);
       break;
     }
   }
-  
-  if (i == iter->ht->num_buckets) { 
+  if (i == iter->ht->num_buckets) {
+    DestroyHashtableIterator(iter);
     return 1; 
   }
   return 0;
