@@ -29,7 +29,16 @@ Movie* CreateMovie() {
     return NULL;
   }
   // TODO: Populate/Initialize movie.
-  
+  mov->id = NULL;
+  mov->type = NULL;
+  mov->title = NULL;
+  mov->isAdult = 0;
+  mov->year = 0;
+  mov->runtime = 0;
+  int i;
+  for (i = 0; i < NUM_GENRES; i++) {
+    mov->genres[i] = NULL;
+  }
   return mov;
 }
 
@@ -39,6 +48,13 @@ void DestroyMovie(Movie* movie) {
   if (movie->title != NULL) free(movie->title);
   
   // TODO: Destroy properly
+  free(movie->isAdult);
+  free(movie->year);
+  free(movie->runtime);
+  int i;
+  for (i = 0; i < NUM_GENRES; i++) {
+    free(moive->genres[i]);
+  }
   free(movie);
 }
 
@@ -95,7 +111,13 @@ Movie* CreateMovieFromRow(char *data_row) {
   mov->runtime = CheckInt(token[7]);
   // TODO: Change such that genres is an array (or linkedlist), not just a string.
 
-
+  char *result = strtok(token[8],",");
+  int i = 0;
+  while (result != NULL) {
+    mov->genres[i] = result;
+    i++;  
+    result = strtok(NULL, ",");
+  }
   return mov;
 }
 
