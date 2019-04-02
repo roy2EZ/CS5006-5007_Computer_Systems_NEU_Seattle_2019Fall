@@ -45,14 +45,14 @@ void CrawlFilesToMap(const char *dir, DocIdMap map) {
   // verify dir is a directory
   int result;
   result = stat((const char *) dir, &s);
-  if (result == -1 || !S_ISDIR(s.st_mode) {
-    return 0;
+  if (result == -1 || !S_ISDIR(s.st_mode)) {
+    return;
   }
   // try open the dir, if fail, return 0
   DIR *rd;
   rd = opendir(dir);
   if (rd == NULL) {
-    return 0;
+    return;
   }
  
   // now we are sure dir can be opened. continue to do check files in dir.
@@ -75,20 +75,22 @@ void CrawlFilesToMap(const char *dir, DocIdMap map) {
     }
 
     int res;
-    res = stat(newfile, &s);
+    res = stat((const char *) newfile, &s);
     if (res == 0) {
       // if the newfile is a file, put it into map
       if (S_ISREG(s.st_mode)) {
-      PutFileInMap(newfile, map);
-    } else if (S_ISDIR(s.st_mode)) {
-      DIR *newdir = opendir(newfile);
-      if (newdir == NULL) {
-        free newfile;
-        continue;
+        PutFileInMap(newfile, map);
+      } else if (S_ISDIR(s.st_mode)) {
+      DIR *newdir; 
+      newdir = opendir(newfile);
+        if (newdir == NULL) {
+          free(newfile);
+          continue;
+        }
+        CrawlFilesToMap(newfile, map);
+        closedir(newdir);
       }
-      CrawlFilesToMap(newdir, map);
-      closedir(newdir);
     }
-    free(newfile); 
   }
+  closedir(rd);
 }
