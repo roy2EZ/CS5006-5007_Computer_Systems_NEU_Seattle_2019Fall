@@ -63,9 +63,14 @@ While you're going through the TODO tags, you'll see some questions where we ask
 ### To answer in README: 
 
 * FileParser.c:135:  // TODO: How big to make this hashtable? How to decide? What to think about?\
+My answer: It's up to CreateIndex() in MovieIndex.c
 * FileParser.c:154:      // TODO: What to do if there is a collision?
+My answer: if the movie already in the index, update with it.
 * main.c:95:  // TODO: Now that you have all the search results, print them out nicely.
+My answer:   PrintReport(index)
 * MovieIndex.c:50:  // TODO: How big to make this hashtable? How to decide? What to think about?
+My answer: It depends on average movie numbers in a file and length of title with how many words.
 * MovieIndex.c:87:  // TODO: How to choose this number? What are the pros and cons of choosing the wrong number?
+My answer: If too small, there will be not enough to such a lot of different word in movie tiles. If too big it is a waste of space.
 
 

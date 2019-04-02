@@ -28,6 +28,23 @@ Index docIndex;
  */
 int CreateMovieFromFileRow(char *file, long rowId, Movie** movie) {
   // TODO: Read a specified row from a specified file into Movie.
+  FILE* f = fopen(file, "r");
+  if (f == NULL) {
+    return -1;
+  }
+  int maxRow = 1000;
+  if (rowId < 0 || rowId > max) {
+    return -1;
+  }
+  char line[maxRow];
+  int i = 0;
+  while (fgets(line, sizeof(line), file)) {
+    i++;
+    if (i == rowId) {
+      movie = CreateMovieFromRow(line)
+    }
+  }
+  fclose(f);
   
   return 0;
 }
@@ -75,7 +92,9 @@ void runQuery(char *term) {
     filename = GetFileFromId(docs, sr->doc_id);
 
     // TODO: What to do with the filename?
-    
+    Movie* movie;
+    CreateMovieFromFileRow(filename, sr->row_id, &movie);
+    InsertLinkedList(movies, (void*) movie);
    
     // Check if there are more
     while (SearchResultIterHasMore(results) != 0) {
@@ -87,8 +106,9 @@ void runQuery(char *term) {
       SearchResultGet(results, sr);
       char *filename = GetFileFromId(docs, sr->doc_id);
       // TODO: What to do with the filename?
-      
-
+      Movie* movie;
+      CreateMovieFromFileRow(filename, sr->row_id, &movie);
+      InsertLinkedList(movies, (void*) movie);
     }
    
     free(sr);
@@ -96,7 +116,7 @@ void runQuery(char *term) {
   }
   // TODO: Now that you have all the search results, print them out nicely.
   
-
+  PrintReport(index);
   DestroyTypeIndex(index);
 }
 

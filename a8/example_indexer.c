@@ -31,11 +31,18 @@
 int main(int argc, char* argv[]) {
 
   // TODO: Parse command-line args to index based on the correct field (see getopt)
-
+  char *filename = "data_tiny/tinyce";
   LinkedList movie_list  = ReadFile(filename);
+  Index index = CreateIndex();  
+  index = BuildMovieIndex(movie_list, Year);
+  DocIdMap map = CreateDocIdMap();
+  PutFileInMap(filename, map);
+  ParseTheFiles(map, index);
 
   
   // TODO: Output report to file, rather than terminal (see MovieReport.h)
+
+  
   PrintReport(index);
 
   DestroyTypeIndex(index);
