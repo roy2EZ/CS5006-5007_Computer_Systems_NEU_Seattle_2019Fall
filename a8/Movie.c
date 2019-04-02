@@ -49,10 +49,7 @@ void DestroyMovie(Movie* movie) {
   
   // TODO: Destroy properly
 
-  int i = 0;
-  while (movie->genres[i] != NULL) {
-    free(movie->genres[i]);
-  }
+
   
   free(movie);
 }
