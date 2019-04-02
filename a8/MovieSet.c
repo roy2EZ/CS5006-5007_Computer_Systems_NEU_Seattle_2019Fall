@@ -24,7 +24,7 @@
 #include "htll/Hashtable.h"
 
 
-static void NullFree(void *freeme) { }
+void NullFree(void *freeme) { }
 
 void SimpleFree(void *payload) {
   free(payload);

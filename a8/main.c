@@ -58,11 +58,13 @@ void runQuery(char *term) {
  
   if (results == NULL) {
     printf("No results for this term. Please try another.\n");
+    DestroyLinkedList(movies, NullFree); 
     return;
   } else {
     SearchResult sr = (SearchResult)malloc(sizeof(*sr));
     if (sr == NULL) {
       printf("Couldn't malloc SearchResult in main.c\n");
+      DestroyLinkedList(movies, NullFree);
       return;
     }
     int result;

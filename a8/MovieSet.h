@@ -118,4 +118,6 @@ SetOfMovies CreateSetOfMovies(char *desc);
 
 int AddMovieToSetOfMovies(SetOfMovies set, Movie *movie);
 
+void NullFree(void *);
+
 #endif
