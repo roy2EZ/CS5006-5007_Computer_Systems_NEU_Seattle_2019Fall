@@ -191,8 +191,8 @@ int AddMovieToIndex(Index index, Movie *movie, enum IndexField field) {
   }
 
   // TODO: How do we put the movie in the index?
+  AddMovieToSetOfMovies(kvp.value, movie);
   
-
   return 0;
 }
 

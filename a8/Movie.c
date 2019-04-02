@@ -48,9 +48,7 @@ void DestroyMovie(Movie* movie) {
   if (movie->title != NULL) free(movie->title);
   
   // TODO: Destroy properly
-
-
-  
+    
   free(movie);
 }
 
@@ -106,8 +104,8 @@ Movie* CreateMovieFromRow(char *data_row) {
   mov->year = CheckInt(token[5]);
   mov->runtime = CheckInt(token[7]);
   // TODO: Change such that genres is an array (or linkedlist), not just a string.
-  char *str = CheckAndAllocateString(token[8]);
-  char *result = strtok(str,",");
+
+  char *result = strtok(token[8],",");
   int i = 0;
   while (result != NULL) {
     mov->genres[i] = result;
