@@ -124,7 +124,8 @@ TEST(MovieStruct, Full) {
   EXPECT_EQ(movie->runtime, 120);
   //  EXPECT_EQ(strcmp(movie->genres, "Comedy,Romance"), 0);
   // TODO: check the right thing for correct genre.
-
+  EXPECT_EQ(strcmp(movie->genres[0], "Comedy"), 0);
+  EXPECT_EQ(strcmp(movie->genres[1], "Romance"), 0);
   DestroyMovie(movie);
 
 }
