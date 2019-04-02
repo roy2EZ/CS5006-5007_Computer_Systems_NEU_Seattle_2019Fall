@@ -37,5 +37,58 @@ void CrawlFilesToMap(const char *dir, DocIdMap map) {
   // TODO: use namelist to find all the files and put them in map.
   // NOTE: There may be nested folders.
   // Be sure to lookup how scandir works. Don't forget about memory use.
+  if (n == -1) {
+    perror("scandir");
+    exit(EXIT_FAILURE);
+  }
   
+  // verify dir is a directory
+  int result;
+  result = stat((const char *) dir, &s);
+  if (result == -1 || !S_ISDIR(s.st_mode) {
+    return 0;
+  }
+  // try open the dir, if fail, return 0
+  DIR *rd;
+  rd = opendir(dir);
+  if (rd == NULL) {
+    return 0;
+  }
+ 
+  // now we are sure dir can be opened. continue to do check files in dir.
+  
+  // iterates namelist
+  for (int i = 0; i < n; i++) {
+    // if the namelist[i] is "." or "..", break that iteration in the loop and continue next iteration
+    if ( strcmp(namelist[i]->d_name, ".") == 0 || strcmp(namelist[i]->d_name, "..") == 0) {
+      continue;
+    }
+    
+    int charsize;
+    charsize = strlen(dir) + 1 + strlen(namelist[i]->d_name) + 1;
+    char *newfile;
+    newfile = (char *) malloc(charsize);
+    if (dir[strlen(dir) - 1] == '/') {
+      snprintf(newfile, charsize, "%s%s", dir, namelist[i]->d_name);
+    } else {
+      snprintf(newfile, charsize, "%s/%s", dir, namelist[i]->d_name);
+    }
+
+    int res;
+    res = stat(newfile, &s);
+    if (res == 0) {
+      // if the newfile is a file, put it into map
+      if (S_ISREG(s.st_mode)) {
+      PutFileInMap(newfile, map);
+    } else if (S_ISDIR(s.st_mode)) {
+      DIR *newdir = opendir(newfile);
+      if (newdir == NULL) {
+        free newfile;
+        continue;
+      }
+      CrawlFilesToMap(newdir, map);
+      closedir(newdir);
+    }
+    free(newfile); 
+  }
 }
