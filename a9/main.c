@@ -4,6 +4,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include "htll/Hashtable.h"
 #include "htll/LinkedList.h"
@@ -54,6 +56,7 @@ void doPrep(char *dir) {
   printf("Crawled %d files.\n", NumElemsInHashtable(docs));
 
   // Create the index
+
   docIndex = CreateIndex();
 
   // Index the files
@@ -126,7 +129,18 @@ void runQueries() {
       }
 
     printf("\n");
+    clock_t start2, end2;
+    double cpu_time_used;
+
+    printf("\n\nRun query result\n");
+    start2 = clock();
     runQuery(input);
+    end2 = clock();
+    cpu_time_used = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
+    printf("Took %f seconds to execute. \n", cpu_time_used);
+
+
+
   }
 }
 

@@ -26,8 +26,8 @@
 
 
 /**
- * An index is a hashtable where they key is a MovieId (Movie->Id),
- * and the value is a MovieSet.
+ * An index is a hashtable where they key is a term, and the value
+ * and the value is either a MovieSet or SetOfMovies.
  *
  * The Index is designed to allow indexing by one of multiple fields.
  */

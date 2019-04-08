@@ -6,7 +6,7 @@ CC = gcc
 GOOGLE_TEST_INCLUDE=${HOME}/src/googletest-release-1.8.0/googletest/include/
 
 # define useful flags to cc/ld/etc.
-CFLAGS = -g -fPIC  -Wall -I. -I.. -Ihtll
+CFLAGS = -g -fPIC  -Wall -I. -I.. -Ihtll -pthread
 LDFLAGS = -L.
 
 
@@ -34,7 +34,7 @@ indexer: example_indexer.c $(OBJS)
 	@echo ===========================
 
 benchmarker: Benchmarker.c $(OBJS)
-	gcc -Wall -g -o benchmarker Benchmarker.c $(OBJS) -L. libHtll.a
+	gcc -Wall -g -o benchmarker Benchmarker.c $(OBJS) -L. libHtll.a -pthread
 	@echo ===========================
 	@echo Run benchmarker by running ./benchmarker dir_name/
 	@echo \(dirname  is the file of movies to use for benchmark\)

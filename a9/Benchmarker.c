@@ -147,6 +147,85 @@ void getMemory() {
          currVirtMem, peakVirtMem);
 }
 
+void runQuery(char *term) {
+  // Figure out how to get a set of Movies and create
+  // a nice report from them.
+  SearchResultIter results = FindMovies(docIndex, term);
+  LinkedList movies = CreateLinkedList();
+
+  if (results == NULL) {
+    printf("No results for this term. Please try another.\n");
+    return;
+  } else {
+    SearchResult sr = (SearchResult)malloc(sizeof(*sr));
+    if (sr == NULL) {
+      printf("Couldn't malloc SearchResult in main.c\n");
+      return;
+    }
+    int result;
+    char *filename;
+
+    // Get the last
+    SearchResultGet(results, sr);
+    filename = GetFileFromId(docs, sr->doc_id);
+
+    Movie *movie;
+    CreateMovieFromFileRow(filename, sr->row_id, &movie);
+    InsertLinkedList(movies, movie);
+
+    // Check if there are more
+    while (SearchResultIterHasMore(results) != 0) {
+      result =  SearchResultNext(results);
+      if (result < 0) {
+        printf("error retrieving result\n");
+        break;
+      }
+      SearchResultGet(results, sr);
+      char *filename = GetFileFromId(docs, sr->doc_id);
+
+      Movie *movie;
+      CreateMovieFromFileRow(filename, sr->row_id, &movie);
+      InsertLinkedList(movies, movie);
+    }
+
+    free(sr);
+    DestroySearchResultIter(results);
+  }
+  // Now that you have all the search results, print them out nicely.
+  Index index = BuildMovieIndex(movies, Type);
+  PrintReport(index);
+
+  DestroyTypeIndex(index);
+}
+
+void runQueries() {
+  char input[1000];
+  while (1) {
+    printf("\nEnter a term to search for, or q to quit: ");
+    scanf("%s", input);
+
+    if (strlen(input) == 1 &&
+        (input[0] == 'q')) {
+          printf("Thanks for playing! \n");
+          return;
+      }
+
+    printf("\n");
+    clock_t start2, end2;
+    double cpu_time_used;
+
+    printf("\n\nRun query result\n");
+    start2 = clock();
+    runQuery(input);
+    end2 = clock();
+    cpu_time_used = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
+    printf("Took %f seconds to execute. \n", cpu_time_used);
+
+
+
+  }
+}
+
 int main(int argc, char *argv[]) {
   // Check arguments
   if (argc != 2) {
@@ -169,23 +248,6 @@ int main(int argc, char *argv[]) {
   clock_t start2, end2;
   double cpu_time_used;
 
-
-  // =======================
-  // Benchmark MovieSet
-  printf("\n\nBuilding the OffsetIndex\n");
-  start2 = clock();
-  BenchmarkMovieSet(docs);
-  end2 = clock();
-  cpu_time_used = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
-  printf("Took %f seconds to execute. \n", cpu_time_used);
-  printf("Memory usage: \n");
-
-  getMemory();
-  DestroyOffsetIndex(docIndex);
-  printf("Destroyed OffsetIndex\n");
-  getMemory();
-  // =======================
-
   // ======================
   // Benchmark SetOfMovies
   printf("\n\nBuilding the TypeIndex\n");
@@ -199,7 +261,27 @@ int main(int argc, char *argv[]) {
   DestroyTypeIndex(movie_index);
   printf("Destroyed TypeIndex\n");
   getMemory();
+
   // ======================
+
+  // =======================
+  // Benchmark MovieSet
+  printf("\n\nBuilding the OffsetIndex\n");
+  start2 = clock();
+  BenchmarkMovieSet(docs);
+  end2 = clock();
+  cpu_time_used = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
+  printf("Took %f seconds to execute. \n", cpu_time_used);
+  printf("Memory usage: \n");
+  getMemory();
+  DestroyOffsetIndex(docIndex);
+  printf("Destroyed OffsetIndex\n");
+  getMemory();
+
+
+  // =======================
+
+
 
   DestroyDocIdMap(docs);
   printf("\n\nDestroyed DocIdMap\n");

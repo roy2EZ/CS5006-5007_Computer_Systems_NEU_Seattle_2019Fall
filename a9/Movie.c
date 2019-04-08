@@ -58,7 +58,6 @@ void DestroyMovieWrapper(void *movie) {
   DestroyMovie((Movie*)movie);
 }
 
-
 char* CheckAndAllocateString(char* token) {
   if (strcmp("-", token) == 0) {
     return NULL;
