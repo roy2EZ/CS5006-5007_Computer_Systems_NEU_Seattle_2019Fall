@@ -39,7 +39,7 @@ int CreateMovieFromFileRow(char *file, long rowId, Movie** movie) {
 
   fp = fopen(file, "r");
 
-  int i=0;
+  int i = 0;
   while (i <= rowId) {
     fgets(buffer, 1000, fp);
     i++;
@@ -204,11 +204,10 @@ void runQueries() {
     printf("\nEnter a term to search for, or q to quit: ");
     scanf("%s", input);
 
-    if (strlen(input) == 1 &&
-        (input[0] == 'q')) {
-          printf("Thanks for playing! \n");
-          return;
-      }
+    if (strlen(input) == 1 && (input[0] == 'q')) {
+      printf("Thanks for playing! \n");
+      return;
+    }
 
     printf("\n");
     clock_t start2, end2;
@@ -220,9 +219,6 @@ void runQueries() {
     end2 = clock();
     cpu_time_used = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
     printf("Took %f seconds to execute. \n", cpu_time_used);
-
-
-
   }
 }
 
@@ -261,9 +257,7 @@ int main(int argc, char *argv[]) {
   DestroyTypeIndex(movie_index);
   printf("Destroyed TypeIndex\n");
   getMemory();
-
   // ======================
-
   // =======================
   // Benchmark MovieSet
   printf("\n\nBuilding the OffsetIndex\n");
@@ -274,18 +268,12 @@ int main(int argc, char *argv[]) {
   printf("Took %f seconds to execute. \n", cpu_time_used);
   printf("Memory usage: \n");
   getMemory();
-  runQueries(); 
+  runQueries();
   DestroyOffsetIndex(docIndex);
   printf("Destroyed OffsetIndex\n");
   getMemory();
-
-
   // =======================
-
-
-
   DestroyDocIdMap(docs);
   printf("\n\nDestroyed DocIdMap\n");
   getMemory();
 }
-

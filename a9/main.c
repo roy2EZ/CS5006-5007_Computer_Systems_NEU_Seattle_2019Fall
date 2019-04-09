@@ -131,7 +131,6 @@ void runQueries() {
     printf("\n");
     clock_t start2, end2;
     double cpu_time_used;
-
     printf("\n\nRun query result\n");
     start2 = clock();
     runQuery(input);
