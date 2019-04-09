@@ -274,6 +274,7 @@ int main(int argc, char *argv[]) {
   printf("Took %f seconds to execute. \n", cpu_time_used);
   printf("Memory usage: \n");
   getMemory();
+  runQueries(); 
   DestroyOffsetIndex(docIndex);
   printf("Destroyed OffsetIndex\n");
   getMemory();
