@@ -26,6 +26,8 @@ Index docIndex;
 char movieSearchResult[SEARCH_RESULT_LENGTH];
 
 int Cleanup();
+char* recieve_message(int client_fd);
+void send_message(char* msg, int sock_fd);
 
 void sigint_handler(int sig) {
   write(0, "Exit signal sent. Cleaning up...\n", 34);
@@ -57,9 +59,24 @@ int Cleanup() {
   return 0;
 }
 
+char* recieve_message(int client_fd) {
+  char buffer[1000];
+  int len = read(client_fd, buffer, sizeof(buffer) - 1);
+  buffer[len] = '\0';
+  printf("SERVER RECEIVED: %s \n", buffer); 
+  char* res = buffer;
+  return res;
+}
+
+void send_message(char* msg, int sock_fd) {
+  
+  write(sock_fd, msg, strlen(msg));
+}
+
+
 int main(int argc, char **argv) {
   // Get args
-
+  
   // Setup graceful exit
   struct sigaction kill;
 
@@ -72,20 +89,70 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  Setup(dir_to_crawl);
+  //Setup(dir_to_crawl);
 
   // Step 1: get address/port info to open
-    
+  struct addrinfo hints, *result;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE;
+  int s;
+  s = getaddrinfo(argv[1], argv[2], &hints, &result);
+  if (s != 0) {
+    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+    exit(1);
+  }
+
   // Step 2: Open socket
+  int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
   
   // Step 3: Bind socket
-  
+  if (bind(sock_fd, result->ai_addr, result->ai_addrlen) != 0) {
+    perror("bind()");
+    exit(1);
+  }
   // Step 4: Listen on the socket
-  
+  if (listen(sock_fd, 10) != 0) {
+    perror("listen()");
+    exit(1);
+  }
+  struct sockaddr_in *result_addr = (struct sockaddr_in *) result->ai_addr;
+  printf("Listening on file descriptor %d, port %d\n", sock_fd, ntohs(result_addr->sin_port));
   // Step 5: Handle clients that connect
+  printf("Waiting for connection...\n");
+  int client_fd = accept(sock_fd, NULL, NULL);
+  printf("Connection made: client_fd=%d\n", client_fd);
 
+  SendAck(client_fd);
+  
+  // here should get the query from client 
+  // char* keyword = recieve_message(client_fd);
+
+  // here should use the keyword for runQuery. 
+  // runQuery(keyword);
+
+  // here after runQuery of keyword, should get results, and send the result number
+  // and send the number and results back to client
+  int result_num = 5;
+  // char results[result_num];
+  for (int i = 0; i < result_num; i++) {
+    // here should put real movie results name
+    //results[i] = "movie name";
+  }
+  send_message("5", client_fd);
+  char* res = recieve_message(client_fd);
+  if (CheckAck(res) == 0) {
+    for (int i = 0; i < result_num; i++) {
+      send_message("movie name", client_fd);
+      if (CheckAck(recieve_message(client_fd)) != 0) {
+        break;
+      }
+    }
+  }
+  SendGoodbye(client_fd);
+  
   // Step 6: Close the socket
-
   // Got Kill signal
   close(sock_fd);
 
