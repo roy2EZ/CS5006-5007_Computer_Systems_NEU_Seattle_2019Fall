@@ -76,6 +76,7 @@ void send_message(char* msg, int sock_fd) {
 
 int main(int argc, char **argv) {
   // Get args
+  char* dir_to_crawl = argv[1];
   
   // Setup graceful exit
   struct sigaction kill;
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  //Setup(dir_to_crawl);
+  Setup(dir_to_crawl);
 
   // Step 1: get address/port info to open
   struct addrinfo hints, *result;
@@ -98,7 +99,7 @@ int main(int argc, char **argv) {
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE;
   int s;
-  s = getaddrinfo(argv[1], argv[2], &hints, &result);
+  s = getaddrinfo(NULL, argv[2], &hints, &result);
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
     exit(1);
