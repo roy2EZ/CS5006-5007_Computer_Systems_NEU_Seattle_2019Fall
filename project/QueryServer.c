@@ -28,7 +28,7 @@ char movieSearchResult[SEARCH_RESULT_LENGTH];
 int Cleanup();
 char* recieve_message(int client_fd);
 void send_message(char* msg, int sock_fd);
-Index runQuery(char *term);
+
 int CreateMovieFromFileRow(char *file, long rowId, Movie** movie);
 
 void sigint_handler(int sig) {
@@ -202,10 +202,10 @@ int main(int argc, char **argv) {
   printf("The keyword for searching is: %s\n", keyword);
 
   // here should use the keyword for runQuery. 
-  Index idx = runQuery(keyword);
+  
   // here after runQuery of keyword, should get results, and send the result number
   // and send the number and results back to client
-  SearchResultIter resultsIter = FindMovies(idx, keyword);
+  SearchResultIter resultsIter = FindMovies(docIndex, keyword);
   int num_result = NumResultsInIter(resultsIter);
   char result_num_string[50];
   sprintf(result_num_string, "%d", num_result);
