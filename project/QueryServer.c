@@ -206,34 +206,44 @@ int main(int argc, char **argv) {
   // and send the number to client
   SearchResultIter resultsIter = FindMovies(docIndex, keyword);
   int num_result = NumResultsInIter(resultsIter);
+  
   char result_num_string[50];
   sprintf(result_num_string, "%d", num_result);
   send_message(result_num_string, client_fd);
   // here should use the keyword for runQuery. 
-  Index res_idx = runQuery(keyword);
-  HTIter iter = CreateHashtableIterator(res_idx->ht);
-  HTKeyValue movie_set;
-  HTIteratorGet(iter, &movie_set);
-  LLIter lliter = CreateLLIter(((SetOfMovies)movie_set.value)->movies);
-  Movie *movie;
-  LLIterGetPayload(lliter, (void**)&movie);
-  char* res = recieve_message(client_fd);
-  if (CheckAck(res) == 0) {
-    for (int i = 0; i < num_result; i++) {
-      // here should send the real results
-      send_message(movie->title, client_fd);
-      LLIterNext(lliter);
-      LLIterGetPayload(lliter, (void**)&movie);
-      if (CheckAck(recieve_message(client_fd)) != 0) {
-        break;
+  if (num_result != 0) {
+    Index res_idx = runQuery(keyword);
+    HTIter htiter = CreateHashtableIterator(res_idx->ht);
+    HTKeyValue movie_set;
+    HTIteratorGet(htiter, &movie_set);
+    LLIter lliter = CreateLLIter(((SetOfMovies)movie_set.value)->movies);
+    Movie *movie;
+    LLIterGetPayload(lliter, (void**)&movie);
+    char* res = recieve_message(client_fd);
+    if (CheckAck(res) == 0) {
+      for (int i = 0; i < num_result; i++) {
+        // here should send the real results
+        send_message(movie->title, client_fd);
+        LLIterNext(lliter);
+        LLIterGetPayload(lliter, (void**)&movie);
+        if (CheckAck(recieve_message(client_fd)) != 0) {
+          break;
+        }
       }
     }
+    DestroyLLIter(lliter);
+    DestroyHashtableIterator(htiter);
   }
-  SendGoodbye(client_fd);
-  
   // Step 6: Close the socket
-  // Got Kill signal
-  close(sock_fd);
+  // Got Kill signal 
+  if (CheckGoodbye(recieve_message(client_fd)) == 0) {
+    printf("Client said goodbye.");
+    close(sock_fd);
+  }
+  
+
+  
+  
 
   Cleanup();
 

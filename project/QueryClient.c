@@ -41,15 +41,16 @@ void RunQuery(char *query) {
       SendAck(sock_fd);
       char* res = result;
       res = get_response(sock_fd);
-      printf("movie result: %s\n", res);
+      printf("Movie title: %s\n", res);
     }
   } 
-  SendAck(sock_fd);
-  if (CheckGoodbye(get_response(sock_fd)) == 0) {
-    // Close the connection
-    close(sock_fd);
-  }
   
+  SendAck(sock_fd);
+  if (strlen(query) == 1) {
+      if (query[0] == 'q') {
+      SendGoodbye(sock_fd);
+    }
+  }
   return;
 }
 
@@ -126,6 +127,7 @@ void RunPrompt() {
     if (strlen(input) == 1) {
       if (input[0] == 'q') {
         printf("Thanks for playing! \n");
+        
         return;
       }
     }
