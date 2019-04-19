@@ -41,7 +41,7 @@ void RunQuery(char *query) {
       SendAck(sock_fd);
       char* res = result;
       res = get_response(sock_fd);
-      printf("movie result: %s", res);
+      printf("movie result: %s\n", res);
     }
   } 
   SendAck(sock_fd);

@@ -28,7 +28,7 @@ char movieSearchResult[SEARCH_RESULT_LENGTH];
 int Cleanup();
 char* recieve_message(int client_fd);
 void send_message(char* msg, int sock_fd);
-
+Index runQuery(char *term);
 int CreateMovieFromFileRow(char *file, long rowId, Movie** movie);
 
 void sigint_handler(int sig) {
@@ -201,22 +201,29 @@ int main(int argc, char **argv) {
   char* keyword = recieve_message(client_fd);
   printf("The keyword for searching is: %s\n", keyword);
 
-  // here should use the keyword for runQuery. 
-  
-  // here after runQuery of keyword, should get results, and send the result number
-  // and send the number and results back to client
+
+  // here after use keyword to find movies, should get results number
+  // and send the number to client
   SearchResultIter resultsIter = FindMovies(docIndex, keyword);
   int num_result = NumResultsInIter(resultsIter);
   char result_num_string[50];
   sprintf(result_num_string, "%d", num_result);
   send_message(result_num_string, client_fd);
-  
- 
+  // here should use the keyword for runQuery. 
+  Index res_idx = runQuery(keyword);
+  HTIter iter = CreateHashtableIterator(res_idx->ht);
+  HTKeyValue movie_set;
+  HTIteratorGet(iter, &movie_set);
+  LLIter lliter = CreateLLIter(((SetOfMovies)movie_set.value)->movies);
+  Movie *movie;
+  LLIterGetPayload(lliter, (void**)&movie);
   char* res = recieve_message(client_fd);
   if (CheckAck(res) == 0) {
     for (int i = 0; i < num_result; i++) {
       // here should send the real results
-      send_message("movie name\n", client_fd);
+      send_message(movie->title, client_fd);
+      LLIterNext(lliter);
+      LLIterGetPayload(lliter, (void**)&movie);
       if (CheckAck(recieve_message(client_fd)) != 0) {
         break;
       }
