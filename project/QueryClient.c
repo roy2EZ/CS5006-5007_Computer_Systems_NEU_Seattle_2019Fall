@@ -29,12 +29,17 @@ void RunQuery(char *query) {
   // Do the query-protocol
   int check1 = CheckAck(get_response(sock_fd));
   if (check1 == 0) {
-    printf("Receivd ACK from server.");
+    printf("Ready to send...\n");
   }
+  
   send_message(query, sock_fd);
-
   int num_of_result = get_num_of_result(sock_fd);
-  printf("The number of results: %d\n", num_of_result);
+  printf("\nThe number of results: %d\n", num_of_result);
+  if (num_of_result == 0) {
+    SendGoodbye(sock_fd);
+    close(sock_fd);
+    return;
+  }
   if (num_of_result != 0) {
     char result[50];
     for (int i = 0; i < num_of_result; i++) {
@@ -44,12 +49,10 @@ void RunQuery(char *query) {
       printf("Movie title: %s\n", res);
     }
   } 
-  
   SendAck(sock_fd);
-  if (strlen(query) == 1) {
-      if (query[0] == 'q') {
-      SendGoodbye(sock_fd);
-    }
+  if (CheckGoodbye(get_response(sock_fd)) == 0) {
+    SendGoodbye(sock_fd);
+    close(sock_fd);
   }
   return;
 }
@@ -127,12 +130,12 @@ void RunPrompt() {
     if (strlen(input) == 1) {
       if (input[0] == 'q') {
         printf("Thanks for playing! \n");
-        
         return;
       }
     }
     printf("\n\n");
     RunQuery(input);
+    return;
   }
 }
 

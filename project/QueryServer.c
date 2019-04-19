@@ -201,10 +201,17 @@ int main(int argc, char **argv) {
   char* keyword = recieve_message(client_fd);
   printf("The keyword for searching is: %s\n", keyword);
 
-
   // here after use keyword to find movies, should get results number
   // and send the number to client
   SearchResultIter resultsIter = FindMovies(docIndex, keyword);
+  
+  if (resultsIter == NULL) {
+    printf("No results for this term.\n");
+    close(client_fd);
+    Cleanup();
+    return 0;
+  }
+
   int num_result = NumResultsInIter(resultsIter);
   
   char result_num_string[50];
@@ -224,9 +231,10 @@ int main(int argc, char **argv) {
       for (int i = 0; i < num_result; i++) {
         // here should send the real results
         send_message(movie->title, client_fd);
+        printf("Sent result of %d\n", i + 1);
         LLIterNext(lliter);
         LLIterGetPayload(lliter, (void**)&movie);
-        if (CheckAck(recieve_message(client_fd)) != 0) {
+        if(CheckAck(recieve_message(client_fd)) != 0) {
           break;
         }
       }
@@ -234,18 +242,12 @@ int main(int argc, char **argv) {
     DestroyLLIter(lliter);
     DestroyHashtableIterator(htiter);
   }
+  SendGoodbye(client_fd);
   // Step 6: Close the socket
   // Got Kill signal 
   if (CheckGoodbye(recieve_message(client_fd)) == 0) {
-    printf("Client said goodbye.");
-    close(sock_fd);
+    close(client_fd);
+    Cleanup();
   }
-  
-
-  
-  
-
-  Cleanup();
-
   return 0;
 }
