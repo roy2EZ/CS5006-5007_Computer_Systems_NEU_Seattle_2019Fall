@@ -27,8 +27,12 @@ void RunQuery(char *query) {
   // Connect to the server
   int sock_fd = do_connect(ip, port_string);
   // Do the query-protocol
-  read_response(sock_fd);
+  int check1 = CheckAck(get_response(sock_fd));
+  if (check1 == 0) {
+    printf("Receivd ACK from server.");
+  }
   send_message(query, sock_fd);
+
   int num_of_result = get_num_of_result(sock_fd);
   char result[50];
   for (int i = 0; i < num_of_result; i++) {

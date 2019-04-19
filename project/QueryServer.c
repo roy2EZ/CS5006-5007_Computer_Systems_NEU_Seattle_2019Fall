@@ -128,10 +128,11 @@ int main(int argc, char **argv) {
   SendAck(client_fd);
   
   // here should get the query from client 
-  // char* keyword = recieve_message(client_fd);
+  char* keyword = recieve_message(client_fd);
+  printf("The keyword for searching is: %s\n", keyword);
 
   // here should use the keyword for runQuery. 
-  // runQuery(keyword);
+  runQuery(keyword);
 
   // here after runQuery of keyword, should get results, and send the result number
   // and send the number and results back to client
@@ -145,7 +146,8 @@ int main(int argc, char **argv) {
   char* res = recieve_message(client_fd);
   if (CheckAck(res) == 0) {
     for (int i = 0; i < result_num; i++) {
-      send_message("movie name", client_fd);
+      // here should send the real results
+      send_message("movie name\n", client_fd);
       if (CheckAck(recieve_message(client_fd)) != 0) {
         break;
       }
