@@ -34,6 +34,7 @@ void RunQuery(char *query) {
   send_message(query, sock_fd);
 
   int num_of_result = get_num_of_result(sock_fd);
+  printf("The number of results: %d", num_of_result);
   char result[50];
   for (int i = 0; i < num_of_result; i++) {
     SendAck(sock_fd);

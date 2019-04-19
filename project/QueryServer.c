@@ -28,6 +28,8 @@ char movieSearchResult[SEARCH_RESULT_LENGTH];
 int Cleanup();
 char* recieve_message(int client_fd);
 void send_message(char* msg, int sock_fd);
+Index runQuery(char *term);
+int CreateMovieFromFileRow(char *file, long rowId, Movie** movie);
 
 void sigint_handler(int sig) {
   write(0, "Exit signal sent. Cleaning up...\n", 34);
@@ -73,6 +75,74 @@ void send_message(char* msg, int sock_fd) {
   write(sock_fd, msg, strlen(msg));
 }
 
+Index runQuery(char *term) {
+  // Figure out how to get a set of Movies and create
+  // a nice report from them.
+  SearchResultIter results = FindMovies(docIndex, term);
+  LinkedList movies = CreateLinkedList();
+
+  if (results == NULL) {
+    printf("No results for this term. Please try another.\n");
+    return NULL;
+  } else {
+    SearchResult sr = (SearchResult)malloc(sizeof(*sr));
+    if (sr == NULL) {
+      printf("Couldn't malloc SearchResult\n");
+      return NULL;
+    }
+    int result;
+    char *filename;
+
+    // Get the last
+    SearchResultGet(results, sr);
+    filename = GetFileFromId(docs, sr->doc_id);
+
+    Movie *movie;
+    CreateMovieFromFileRow(filename, sr->row_id, &movie);
+    InsertLinkedList(movies, movie);
+
+    // Check if there are more
+    while (SearchResultIterHasMore(results) != 0) {
+      result =  SearchResultNext(results);
+      if (result < 0) {
+        printf("error retrieving result\n");
+        break;
+      }
+      SearchResultGet(results, sr);
+      char *filename = GetFileFromId(docs, sr->doc_id);
+
+      Movie *movie;
+      CreateMovieFromFileRow(filename, sr->row_id, &movie);
+      InsertLinkedList(movies, movie);
+    }
+
+    free(sr);
+    DestroySearchResultIter(results);
+  }
+  // Now that you have all the search results, print them out nicely.
+  Index index = BuildMovieIndex(movies, Type);
+  return index;
+}
+
+int CreateMovieFromFileRow(char *file, long rowId, Movie** movie) {
+  FILE *fp;
+
+  char buffer[1000];
+
+  fp = fopen(file, "r");
+
+  int i = 0;
+  while (i <= rowId) {
+    fgets(buffer, 1000, fp);
+    i++;
+  }
+  // taking \n out of the row
+  buffer[strlen(buffer)-1] = ' ';
+  // Create movie from row
+  *movie = CreateMovieFromRow(buffer);
+  fclose(fp);
+  return 0;
+}
 
 int main(int argc, char **argv) {
   // Get args
@@ -132,20 +202,19 @@ int main(int argc, char **argv) {
   printf("The keyword for searching is: %s\n", keyword);
 
   // here should use the keyword for runQuery. 
-  runQuery(keyword);
-
+  Index idx = runQuery(keyword);
   // here after runQuery of keyword, should get results, and send the result number
   // and send the number and results back to client
-  int result_num = 5;
-  // char results[result_num];
-  for (int i = 0; i < result_num; i++) {
-    // here should put real movie results name
-    //results[i] = "movie name";
-  }
-  send_message("5", client_fd);
+  SearchResultIter resultsIter = FindMovies(idx, keyword);
+  int num_result = NumResultsInIter(resultsIter);
+  char result_num_string[50];
+  sprintf(result_num_string, "%d", num_result);
+  send_message(result_num_string, client_fd);
+  
+ 
   char* res = recieve_message(client_fd);
   if (CheckAck(res) == 0) {
-    for (int i = 0; i < result_num; i++) {
+    for (int i = 0; i < num_result; i++) {
       // here should send the real results
       send_message("movie name\n", client_fd);
       if (CheckAck(recieve_message(client_fd)) != 0) {
