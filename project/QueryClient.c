@@ -1,3 +1,8 @@
+/**
+ * Final project of CS5007
+ * @author Rongyi Chen
+ * @date 2019/04/20
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
