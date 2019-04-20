@@ -58,113 +58,111 @@ void sigint_handler(int sig) {
 
 int HandleConnections(int sock_fd) {
   // Step 5: Accept connection
-  int opt = 1;   
-  int addrlen, new_socket, activity, i, valread, sd;   
+  int opt = 1;
+  int addrlen, new_socket, activity, i, valread, sd;
   int max_sd;
   struct sockaddr_in address;
   char buffer[1025];
-  fd_set readfds; 
-  char *message = "test message \r\n"; 
+  fd_set readfds;
+  char *message = "test message \r\n";
   // max number of clients
   int max_clients = 30;
   int client_socket[30];
-  //initialise all client_socket[] to 0; 
-  for (i = 0; i < max_clients; i++) {   
-    client_socket[i] = 0;   
+  // initialise all client_socket[] to 0;
+  for (i = 0; i < max_clients; i++) {
+    client_socket[i] = 0;
   }
-  //set master socket to allow multiple connections
-  if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ) {   
-    perror("setsockopt");   
-    exit(EXIT_FAILURE);   
+  // set master socket to allow multiple connections
+  if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR,
+    (char *)&opt, sizeof(opt)) < 0 ) {
+    perror("setsockopt");
+    exit(EXIT_FAILURE);
   }
-  //try to specify maximum of 3 pending connections for the master socket  
-  if (listen(sock_fd, 3) < 0) {   
-    perror("listen");   
-    exit(EXIT_FAILURE);   
-  } 
-  // Fork on every connection. 
-  //accept the incoming connection  
-  addrlen = sizeof(address);   
-  puts("Waiting for connections ...");     
-  while (1) {   
-    //clear the socket set  
-    FD_ZERO(&readfds);    
-    //add master socket to set  
+  // try to specify maximum of 3 pending connections for the master socket
+  if (listen(sock_fd, 3) < 0) {
+    perror("listen");
+    exit(EXIT_FAILURE);
+  }
+  // Fork on every connection.
+  // accept the incoming connection
+  addrlen = sizeof(address);
+  puts("Waiting for connections ...");
+  while (1) {
+    // clear the socket set
+    FD_ZERO(&readfds);
+    // add master socket to set
     FD_SET(sock_fd, &readfds);
-    max_sd = sock_fd;        
-    //add child sockets to set  
-    for ( i = 0 ; i < max_clients ; i++) {
-      //socket descriptor
-      sd = client_socket[i];         
-      //if valid socket descriptor then add to read list  
-      if(sd > 0) {
-        FD_SET( sd , &readfds); 
-      }   
-      //highest file descriptor number, need it for the select function  
+    max_sd = sock_fd;
+    // add child sockets to set
+    for (i = 0; i < max_clients; i++) {
+      // socket descriptor
+      sd = client_socket[i];
+      // if valid socket descriptor then add to read list
+      if (sd > 0) {
+        FD_SET(sd , &readfds);
+      }
+      // highest file descriptor number, need it for the select function
       if (sd > max_sd) {
         max_sd = sd;
       }
-    }   
-    //wait for an activity on one of the sockets , timeout is NULL ,  
-    //so wait indefinitely  
+    }
+    // wait for an activity on one of the sockets, timeout is NULL,
+    // so wait indefinitely
     activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
-    if ((activity < 0) && (errno!=EINTR)) {   
+    if ((activity < 0) && (errno != EINTR)) {
       printf("select error");
-    }   
-             
-    //If something happened on the master socket ,  
-    //then its an incoming connection  
-    if (FD_ISSET(sock_fd, &readfds)) {            
-      if ((new_socket = accept(sock_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) {   
-        perror("accept");   
-        exit(EXIT_FAILURE);   
-      }       
-      //inform user of socket number - used in send and receive commands  
-      printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket,           		inet_ntoa(address.sin_addr) , ntohs (address.sin_port));   
-           
-      //send new connection greeting message  
-      if (send(new_socket, message, strlen(message), 0) != strlen(message)) {   
-        perror("send");   
-      }   
-      puts("Welcome");   
-               
-      //add new socket to array of sockets  
-      for (i = 0; i < max_clients; i++) {   
-        //if position is empty  
-        if( client_socket[i] == 0 ) {   
-          client_socket[i] = new_socket;   
-          printf("Adding to list of sockets as %d\n" , i);   
-                         
-          break;   
-        }   
-      }   
-    }   
-             
-    //else its some IO operation on some other socket 
-    for (i = 0; i < max_clients; i++) {   
+    }
+    // If something happened on the master socket,
+    // then it's an incoming connection
+    if (FD_ISSET(sock_fd, &readfds)) {
+      if ((new_socket = accept(sock_fd, (struct sockaddr *)&address,
+        (socklen_t*)&addrlen)) < 0) {
+        perror("accept");
+        exit(EXIT_FAILURE);
+      }
+      // inform user of socket number - used in send and receive commands
+      printf("New connection , socket fd is %d , ip is : %s , port : %d\n",
+        new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+      // send new connection greeting message
+      if (send(new_socket, message, strlen(message), 0) != strlen(message)) {
+        perror("send");
+      }
+      puts("Welcome");
+      // add new socket to array of sockets
+      for (i = 0; i < max_clients; i++) {
+        // if position is empty
+        if (client_socket[i] == 0) {
+          client_socket[i] = new_socket;
+          printf("Adding to list of sockets as %d\n", i);
+          break;
+        }
+      }
+    }
+    // else its some IO operation on some other socket
+    for (i = 0; i < max_clients; i++) {
       sd = client_socket[i];
-                
-      if (FD_ISSET( sd , &readfds)) {   
-        //Check if it was for closing , and also read the  
-        //incoming message  
-        if ((valread = read(sd, buffer, 1024)) == 0) {   
-          //Somebody disconnected , get his details and print  
-          getpeername(sd, (struct sockaddr*)&address, (socklen_t*)&addrlen);   
-          printf("Host disconnected , ip %s , port %d \n", inet_ntoa(address.sin_addr),
-                  ntohs(address.sin_port));
-          //Close the socket and mark as 0 in list for reuse  
-          close( sd );
-          client_socket[i] = 0;   
+
+      if (FD_ISSET(sd, &readfds)) {
+        // Check if it was for closing , and also read the
+        // incoming message
+        if ((valread = read(sd, buffer, 1024)) == 0) {
+          // Somebody disconnected , get his details and print
+          getpeername(sd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
+          printf("Host disconnected, ip %s, port %d \n",
+            inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+          // Close the socket and mark as 0 in list for reuse
+          close(sd);
+          client_socket[i] = 0;
         } else {
-          //Echo back the message that came in  
-          //set the string terminating NULL byte on the end  
-          //of the data read  
-          buffer[valread] = '\0';   
-          send(sd , buffer , strlen(buffer) , 0 );   
-        }   
-      }   
-    }   
-  }          
+          // Echo back the message that came in
+          // set the string terminating NULL byte on the end
+          // of the data read
+          buffer[valread] = '\0';
+          send(sd, buffer, strlen(buffer), 0);
+        }
+      }
+    }
+  }
   return 0;
 }
 
@@ -230,7 +228,7 @@ int main(int argc, char **argv) {
   }
   // Step 2: Open socket
   int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-  // Step 3: Bind socket 
+  // Step 3: Bind socket
   if (bind(sock_fd, result->ai_addr, result->ai_addrlen) != 0) {
     perror("bind()");
     exit(1);
@@ -241,7 +239,8 @@ int main(int argc, char **argv) {
       exit(1);
   }
   struct sockaddr_in *result_addr = (struct sockaddr_in *) result->ai_addr;
-  printf("Listening on file descriptor %d, port %d\n", sock_fd, ntohs(result_addr->sin_port));
+  printf("Listening on file descriptor %d, port %d\n",
+    sock_fd, ntohs(result_addr->sin_port));
   // Step 5: Handle the connections
   int client_fd = accept(sock_fd, NULL, NULL);
   HandleConnections(client_fd);
