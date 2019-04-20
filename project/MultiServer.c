@@ -139,7 +139,7 @@ int HandleConnections(int sock_fd) {
       }
     }
     // else its some IO operation on some other socket
-    for (i = 0; i < max_clients; i++) {
+    for (i = 0; i < max_clients; is++) {
       sd = client_socket[i];
 
       if (FD_ISSET(sd, &readfds)) {
