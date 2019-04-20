@@ -65,13 +65,12 @@ char* recieve_message(int client_fd) {
   char buffer[1000];
   int len = read(client_fd, buffer, sizeof(buffer) - 1);
   buffer[len] = '\0';
-  printf("SERVER RECEIVED: %s \n", buffer); 
+  printf("SERVER RECEIVED: %s \n", buffer);
   char* res = buffer;
   return res;
 }
 
 void send_message(char* msg, int sock_fd) {
-  
   write(sock_fd, msg, strlen(msg));
 }
 
@@ -82,7 +81,7 @@ Index runQuery(char *term) {
   LinkedList movies = CreateLinkedList();
 
   if (results == NULL) {
-    printf("No results for this term. Please try another.\n");
+    printf("No results for this term.\n");
     return NULL;
   } else {
     SearchResult sr = (SearchResult)malloc(sizeof(*sr));
@@ -147,7 +146,7 @@ int CreateMovieFromFileRow(char *file, long rowId, Movie** movie) {
 int main(int argc, char **argv) {
   // Get args
   char* dir_to_crawl = argv[1];
-  
+
   // Setup graceful exit
   struct sigaction kill;
 
@@ -177,7 +176,7 @@ int main(int argc, char **argv) {
 
   // Step 2: Open socket
   int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-  
+
   // Step 3: Bind socket
   if (bind(sock_fd, result->ai_addr, result->ai_addrlen) != 0) {
     perror("bind()");
@@ -189,65 +188,63 @@ int main(int argc, char **argv) {
     exit(1);
   }
   struct sockaddr_in *result_addr = (struct sockaddr_in *) result->ai_addr;
-  printf("Listening on file descriptor %d, port %d\n", sock_fd, ntohs(result_addr->sin_port));
+  printf("Listening on file descriptor %d, port %d\n",
+    sock_fd, ntohs(result_addr->sin_port));
   // Step 5: Handle clients that connect
   printf("Waiting for connection...\n");
-  int client_fd = accept(sock_fd, NULL, NULL);
-  printf("Connection made: client_fd=%d\n", client_fd);
+  while (1) {
+    int client_fd = accept(sock_fd, NULL, NULL);
+    printf("Connection made: client_fd=%d\n", client_fd);
+    SendAck(client_fd);
+    // here should get the query from client
+    char* keyword = recieve_message(client_fd);
+    printf("The keyword for searching is: %s\n", keyword);
+    // here after use keyword to find movies, should get results number
+    // and send the number to client
+    SearchResultIter resultsIter = FindMovies(docIndex, keyword);
+    if (resultsIter == NULL) {
+      printf("No results for this term.\n");
+      close(client_fd);
+      Cleanup();
+      return 0;
+    }
 
-  SendAck(client_fd);
-  
-  // here should get the query from client 
-  char* keyword = recieve_message(client_fd);
-  printf("The keyword for searching is: %s\n", keyword);
-
-  // here after use keyword to find movies, should get results number
-  // and send the number to client
-  SearchResultIter resultsIter = FindMovies(docIndex, keyword);
-  
-  if (resultsIter == NULL) {
-    printf("No results for this term.\n");
-    close(client_fd);
-    Cleanup();
-    return 0;
-  }
-
-  int num_result = NumResultsInIter(resultsIter);
-  
-  char result_num_string[50];
-  sprintf(result_num_string, "%d", num_result);
-  send_message(result_num_string, client_fd);
-  // here should use the keyword for runQuery. 
-  if (num_result != 0) {
-    Index res_idx = runQuery(keyword);
-    HTIter htiter = CreateHashtableIterator(res_idx->ht);
-    HTKeyValue movie_set;
-    HTIteratorGet(htiter, &movie_set);
-    LLIter lliter = CreateLLIter(((SetOfMovies)movie_set.value)->movies);
-    Movie *movie;
-    LLIterGetPayload(lliter, (void**)&movie);
-    char* res = recieve_message(client_fd);
-    if (CheckAck(res) == 0) {
-      for (int i = 0; i < num_result; i++) {
-        // here should send the real results
-        send_message(movie->title, client_fd);
-        printf("Sent result of %d\n", i + 1);
-        LLIterNext(lliter);
-        LLIterGetPayload(lliter, (void**)&movie);
-        if(CheckAck(recieve_message(client_fd)) != 0) {
-          break;
+    int num_result = NumResultsInIter(resultsIter);
+    char result_num_string[50];
+    sprintf(result_num_string, "%d", num_result);
+    send_message(result_num_string, client_fd);
+    // here should use the keyword for runQuery.
+    if (num_result != 0) {
+      Index res_idx = runQuery(keyword);
+      HTIter htiter = CreateHashtableIterator(res_idx->ht);
+      HTKeyValue movie_set;
+      HTIteratorGet(htiter, &movie_set);
+      LLIter lliter = CreateLLIter(((SetOfMovies)movie_set.value)->movies);
+      Movie *movie;
+      LLIterGetPayload(lliter, (void**)&movie);
+      char* res = recieve_message(client_fd);
+      if (CheckAck(res) == 0) {
+        for (int i = 0; i < num_result; i++) {
+          // here should send the real results
+          send_message(movie->title, client_fd);
+          printf("Sent result of %d\n", i + 1);
+          LLIterNext(lliter);
+          LLIterGetPayload(lliter, (void**)&movie);
+          if (CheckAck(recieve_message(client_fd)) != 0) {
+            break;
+          }
         }
       }
+      DestroyLLIter(lliter);
+      DestroyHashtableIterator(htiter);
     }
-    DestroyLLIter(lliter);
-    DestroyHashtableIterator(htiter);
-  }
-  SendGoodbye(client_fd);
-  // Step 6: Close the socket
-  // Got Kill signal 
-  if (CheckGoodbye(recieve_message(client_fd)) == 0) {
-    close(client_fd);
-    Cleanup();
+    SendGoodbye(client_fd);
+//  Step 6: Close the socket
+//  Got Kill signal
+//  if (CheckGoodbye(recieve_message(client_fd)) == 0) {
+//    close(client_fd);
+//    Cleanup();
+//  }
   }
   return 0;
 }

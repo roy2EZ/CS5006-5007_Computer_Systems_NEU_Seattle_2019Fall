@@ -31,7 +31,7 @@ void RunQuery(char *query) {
   if (check1 == 0) {
     printf("Ready to send...\n");
   }
-  
+
   send_message(query, sock_fd);
   int num_of_result = get_num_of_result(sock_fd);
   printf("\nThe number of results: %d\n", num_of_result);
@@ -46,15 +46,10 @@ void RunQuery(char *query) {
       SendAck(sock_fd);
       char* res = result;
       res = get_response(sock_fd);
-      printf("Movie title: %s\n", res);
+      printf("Movie title %d: %s\n", i + 1, res);
     }
-  } 
-  SendAck(sock_fd);
-  if (CheckGoodbye(get_response(sock_fd)) == 0) {
-    SendGoodbye(sock_fd);
-    close(sock_fd);
   }
-  return;
+  SendAck(sock_fd);
 }
 
 int do_connect(char *host, char *port) {
@@ -69,20 +64,20 @@ int do_connect(char *host, char *port) {
   hints.ai_socktype = SOCK_STREAM; /* TCP */
   s = getaddrinfo(host, port, &hints, &result);
 
-  // If I can't get the address, write an error. 
+  // If I can't get the address, write an error.
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
     exit(1);
   }
 
-  // Try to connect; if I can't, write an error. 
+  // Try to connect; if I can't, write an error.
   if (connect(sock_fd, result->ai_addr, result->ai_addrlen) == -1) {
     perror("connect");
     exit(2);
   } else {
-    printf("Connection is good!\n"); 
+    printf("Connection is good!\n");
   }
-  return sock_fd; 
+  return sock_fd;
 }
 
 void read_response(int sock_fd) {
@@ -135,7 +130,6 @@ void RunPrompt() {
     }
     printf("\n\n");
     RunQuery(input);
-    return;
   }
 }
 
